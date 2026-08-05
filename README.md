@@ -9,6 +9,7 @@
 - `npm run test`: runs all test suites
 - `npm run test:watch`: runs all test suites, watches for changes, and reruns tests when they change
 - `npm run test:coverage`: runs all tests and generates a coverage report
+- `npm run test:ui`: runs all tests in UI mode
 
 ## API 
 The API should run at `http://localhost:3000`.
