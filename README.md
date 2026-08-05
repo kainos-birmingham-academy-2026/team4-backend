@@ -6,7 +6,6 @@ Team4 Backend
 1 - Run these commands to install the necessary libraries:
 ```
 npm install
-npx tsc --init
 ```
 
 2 - Run these commands 
