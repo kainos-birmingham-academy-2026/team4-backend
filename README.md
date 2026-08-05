@@ -5,8 +5,7 @@ Team4 Backend
 
 1 - Run these commands to install the necessary libraries:
 ```
-npm install express
-npm install -D typescript @types/node @types/express tsx
+npm install
 npx tsc --init
 ```
 
