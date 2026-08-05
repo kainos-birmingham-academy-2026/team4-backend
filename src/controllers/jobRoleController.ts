@@ -8,11 +8,16 @@ import { JobRole } from "../models/jobRole";
 export class JobRoleController {
   constructor(private readonly jobRoleService: JobRoleService = new JobRoleService()) {}
 
-    private readonly jobRoleMapper = new JobRoleMapper();
+  async getAllJobRoles(req: Request, res: Response): Promise<void> {
 
-    async getAllJobRoles(_req: Request, res: Response): Promise<JobRoleResponse[]> {
-        const jobRoles : JobRole[] = await prisma.jobRole.findMany();
-        const jobRoleResponses = await Promise.all(jobRoles.map(jobRole => this.jobRoleMapper.mapJobRoleToResponse(jobRole)));
-        return jobRoleResponses;
+    try {
+        let jobRoles: JobRoleResponse[] = [];
+        jobRoles = await this.jobRoleService.findAllJobRoles(req, res);
+        res.status(200).json(jobRoles);
+        return;
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
     }
+  }
+
 }
