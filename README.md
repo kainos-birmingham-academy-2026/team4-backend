@@ -16,4 +16,4 @@ npm run build
 npm run dev
 ```
 
-The API should be running at `http://localhost/3000`
+The API should be running at `http://localhost:3000`
