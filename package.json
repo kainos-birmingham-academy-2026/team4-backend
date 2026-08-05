@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Team4 Backend",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"No tests configured\"",
     "dev": "tsx watch src/index.ts",
