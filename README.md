@@ -10,6 +10,9 @@
 - `npm run test:watch`: runs all test suites, watches for changes, and reruns tests when they change
 - `npm run test:coverage`: runs all tests and generates a coverage report
 - `npm run test:ui`: runs all tests in UI mode
+## Linting scripts
+- `npm run lint`: runs the linter and flags any issues
+- `npm run lint:fix`: runs the linter and performs any safe fixes
 
 ## API 
 The API should run at `http://localhost:3000`.
