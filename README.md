@@ -5,6 +5,11 @@
 - `npm run dev`: runs the app in hot reload mode
 - `npm run start`: starts the new app from the `./dist` folder 
 
+## Test scripts
+- `npm run test`: runs all test suites
+- `npm run test:watch`: runs all test suites, watches for changes, and reruns tests when they change
+- `npm run test:coverage`: runs all tests and generates a coverage report
+
 ## API 
 The API should run at `http://localhost:3000`.
 `http://localhost:3000/health` should display the current time. 
