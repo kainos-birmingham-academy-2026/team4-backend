@@ -35,3 +35,5 @@ Add an `.env` file and put this database URL connection string in the file:
 ```bash
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/jobRoles"
 ```
+
+Make sure to change the USER and PASSWORD to your database username and password.
