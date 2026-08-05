@@ -33,5 +33,5 @@ docker run --name jobRoles-db -e POSTGRES_PASSWORD=password -e POSTGRES_DB=jobRo
 Add an `.env` file and put this database URL connection string in the file:
 
 ```bash
-DATABASE_URL="postgresql://postgres:password@localhost:5432/jobRoles"
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/jobRoles"
 ```
