@@ -2,9 +2,16 @@ import { Router } from "express";
 import { JobRoleController } from "../controllers/jobRoleController";
 import { JobRoleService } from "../services/jobRoleService";
 
-const router = Router();
-const controller = new JobRoleController(new JobRoleService());
 
-router.get("/", controller.getAllJobRoles.bind(controller));
+export const createJobRoleRouter = (jobRoleService?: JobRoleService): Router => {
+    const router = Router();
+    const controller = new JobRoleController(jobRoleService ?? new JobRoleService());
 
-export default router;
+    router.get("/", controller.getAllJobRoles.bind(controller));
+
+    return router;
+};
+
+
+
+export default createJobRoleRouter();
