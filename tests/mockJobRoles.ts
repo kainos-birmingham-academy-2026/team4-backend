@@ -14,3 +14,21 @@ export const mockJobRole2 = {
     isOpen: true
 };
 export const mockJobRoles = [mockJobRole1, mockJobRole2];
+
+export const mockJobRoleResponse1 = {
+    roleName: "Software Engineer",
+    location: "Remote",
+    capabilityName: "Engineering",
+    bandName: "Band 1",
+    closingDate: new Date("2024-12-31")
+};
+
+export const mockJobRoleResponse2 = {
+    roleName: "Product Manager",
+    location: "New York",
+    capabilityName: "Product Management",
+    bandName: "Band 2",
+    closingDate: new Date("2024-11-30")
+};
+
+export const mockJobRoleResponses = [mockJobRoleResponse1, mockJobRoleResponse2];
