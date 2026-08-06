@@ -1,7 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { JobRoleController } from "../../src/controllers/jobRoleController";
-import { JobRoleService } from "../../src/services/jobRoleService";
-import { Request, Response } from "express";
+import type { JobRoleService } from "../../src/services/jobRoleService";
+import type { Request, Response } from "express";
 import { mockJobRoles } from "../mockJobRoles";
 
 const mockRequest = {

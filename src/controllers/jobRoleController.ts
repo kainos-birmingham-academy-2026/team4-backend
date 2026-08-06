@@ -1,8 +1,6 @@
-import { Request, Response } from "express";
+import type { JobRoleResponse } from "../dtos/jobRoleDto";
 import { JobRoleService } from "../services/jobRoleService";
-import { JobRoleResponse } from "../dtos/jobRoleDto";
-import { JobRoleMapper } from "../mappers/jobRoleMapper";
-import type { JobRole } from "@prisma/client";
+import type { Request, Response } from "express";
 
 export class JobRoleController {
   constructor(private readonly jobRoleService: JobRoleService = new JobRoleService()) {}
@@ -14,7 +12,7 @@ export class JobRoleController {
         jobRoles = await this.jobRoleService.findAllJobRoles(req, res);
         res.status(200).json(jobRoles);
         return;
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Internal server error" });
     }
   }

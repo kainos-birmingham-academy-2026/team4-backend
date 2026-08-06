@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 export class JobRoleResponse {
     constructor(
         public readonly roleName: string,
