@@ -10,6 +10,6 @@
         "forceConsistentCasingInFileNames": true, // ensure consistent casing in imports
         "skipLibCheck": true, // skip type checking of declaration files for faster builds
     },
-    "include": ["src/**/*"], 
+    "include": ["src/**/*", "tests"], 
     "exclude": ["node_modules", "dist"] // only compile files under src/
 }
