@@ -64,15 +64,15 @@ async function main() {
             {
                 roleName: "Graduate Software Engineer",
                 location: "Birmingham",
-                capabilityId: capabilityMap["Engineering"],
-                bandId: bandMap["Trainee"],
+                capabilityId: capabilityMap.Engineering,
+                bandId: bandMap.Trainee,
                 closingDate: new Date("2026-10-22"),
                 status: "Open"
             },
             {
                 roleName: "Senior Test Engineer",
                 location: "Belfast",
-                capabilityId: capabilityMap["Engineering"],
+                capabilityId: capabilityMap.Engineering,
                 bandId: bandMap["Senior Associate"],
                 closingDate: new Date("2026-09-19"),
                 status: "Open"
@@ -80,8 +80,8 @@ async function main() {
             {
                 roleName: "Associate Platform Engineer",
                 location: "Derry/Londonderry",
-                capabilityId: capabilityMap["Platforms"],
-                bandId: bandMap["Associate"],
+                capabilityId: capabilityMap.Platforms,
+                bandId: bandMap.Associate,
                 closingDate: new Date("2025-08-13"),
                 status: "Closed"
             },
@@ -89,7 +89,7 @@ async function main() {
                 roleName: "Lead Data Engineer",
                 location: "London",
                 capabilityId: capabilityMap["Data & AI"],
-                bandId: bandMap["Consultant"],
+                bandId: bandMap.Consultant,
                 closingDate: new Date("2026-12-16"),
                 status: "Open"
             }
