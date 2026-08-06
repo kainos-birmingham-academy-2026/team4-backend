@@ -82,8 +82,8 @@ async function main() {
                 location: "Derry/Londonderry",
                 capabilityId: capabilityMap.Platforms,
                 bandId: bandMap.Associate,
-                closingDate: new Date("2025-08-13"),
-                status: "Closed"
+                closingDate: new Date("2026-10-13"),
+                status: "Open"
             },
             {
                 roleName: "Lead Data Engineer",
