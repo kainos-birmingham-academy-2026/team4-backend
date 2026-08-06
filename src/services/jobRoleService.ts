@@ -1,7 +1,7 @@
 import type { JobRole } from "@prisma/client";
-import type { JobRoleResponse } from "../dtos/jobRoleDto";
-import { JobRoleMapper } from "../mappers/jobRoleMapper";
-import prisma from "../prismaClient";
+import type { JobRoleResponse } from "../dtos/jobRoleDto.js";
+import { JobRoleMapper } from "../mappers/jobRoleMapper.js";
+import prisma from "../prismaClient.js";
 
 
 export class JobRoleService {

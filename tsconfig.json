@@ -1,15 +1,17 @@
 {
     "compilerOptions": {
-        "target": "ES2022", // compile to modern JS (async/await, etc.)
-        "module": "ESNext", // use ES module syntax (import/export)
-        "moduleResolution": "bundler", // resolve modules like a bundler (Vite/tsx)
+        "target": "ES2020", // compile to modern JS (async/await, etc.)
+        "module": "NodeNext", // emit code compatible with Node.js ESM/CJS rules
+        "moduleResolution": "NodeNext", // resolve modules using Node.js semantics
         "esModuleInterop": true, // allows default imports from CommonJS packages
         "strict": true, // enables all strict type checks
         "outDir": "./dist", // compiled JS output folder
         "rootDir": "./src", // where your TypeScript source live
         "forceConsistentCasingInFileNames": true, // ensure consistent casing in imports
-        "skipLibCheck": true, // skip type checking of declaration files for faster builds
+        "skipLibCheck": true, // skip type checking of declaration files for faster builds,
+        "resolveJsonModule": true,
+        "types": ["node"]
     },
-    "include": ["src/**/*"], 
+    "include": ["src/**/*"], // include all TS files in src and tests
     "exclude": ["node_modules", "dist"] // only compile files under src/
 }

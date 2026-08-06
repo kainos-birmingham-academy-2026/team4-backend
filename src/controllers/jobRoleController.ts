@@ -1,5 +1,5 @@
-import type { JobRoleResponse } from "../dtos/jobRoleDto";
-import { JobRoleService } from "../services/jobRoleService";
+import type { JobRoleResponse } from "../dtos/jobRoleDto.js";
+import { JobRoleService } from "../services/jobRoleService.js";
 import type { Request, Response } from "express";
 
 export class JobRoleController {
