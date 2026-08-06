@@ -9,7 +9,7 @@ export class JobRoleController {
 
     try {
         let jobRoles: JobRoleResponse[] = [];
-        jobRoles = await this.jobRoleService.findAllJobRoles(req, res);
+        jobRoles = await this.jobRoleService.findAllJobRoles();
         res.status(200).json(jobRoles);
         return;
     } catch (_error) {
