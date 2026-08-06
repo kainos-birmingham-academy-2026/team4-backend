@@ -1,4 +1,4 @@
-import { JobRole } from "../models/jobRole";
+import type { JobRole } from "@prisma/client";
 import { JobRoleResponse } from "../dtos/jobRoleDto";
 import prisma from "../prismaClient";
 
@@ -13,7 +13,7 @@ export class JobRoleMapper {
         return capability?.capabilityName || "Unknown";
     }
 
-    private async getBandName(bandId: string): Promise<string> {
+    private async getBandName(bandId: number): Promise<string> {
         const band = await prisma.band.findUnique({
             where: { bandId },
             select: { bandName: true },
