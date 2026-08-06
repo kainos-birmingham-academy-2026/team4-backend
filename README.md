@@ -20,8 +20,8 @@
 
 
 ## API 
-The API should run at `http://localhost:3000`.
-`http://localhost:3000/health` should display the current time. 
+The API should run at `http://localhost:4000`.
+`http://localhost:4000/health` should display the current time. 
 
 
 ## Docker Setup
