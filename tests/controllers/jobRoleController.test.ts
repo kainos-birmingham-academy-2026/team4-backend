@@ -2,6 +2,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import { JobRoleController } from "../../src/controllers/jobRoleController";
 import { JobRoleService } from "../../src/services/jobRoleService";
 import { Request, Response } from "express";
+import { mockJobRoles } from "../mockJobRoles";
 
 const mockRequest = {
     params: {},
@@ -17,24 +18,6 @@ const mockResponse = {
 const mockJobRoleService = {
     findAllJobRoles: vi.fn()
 } as unknown as JobRoleService;
-
-const mockJobRole1 = {
-    id: 1,
-    title: "Software Engineer",
-    description: "Develop and maintain software applications.",
-    location: "Remote",
-    isOpen: true
-};
-
-const mockJobRole2 = {
-    id: 2,
-    title: "Product Manager",
-    description: "Oversee product development and strategy.",
-    location: "New York",
-    isOpen: true
-};
-
-const mockJobRoles = [mockJobRole1, mockJobRole2];
 
 describe("JobRoleController - getAllJobRoles", async () => {
     let jobRoleController: JobRoleController;
