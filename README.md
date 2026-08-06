@@ -22,6 +22,7 @@
 ## API 
 The API should run at `http://localhost:4000`.
 `http://localhost:4000/health` should display the current time. 
+`http://localhost:4000/api/job-roles` should return a JSON object containing a list of open job roles.
 
 
 ## Docker Setup
