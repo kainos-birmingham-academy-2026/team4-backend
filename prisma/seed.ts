@@ -48,15 +48,15 @@ async function main() {
     });
 
     // Read back for IDs
-    const capabilitiesRows = await prisma.capability.findMany();
-    const bandsRows = await prisma.band.findMany();
+    const capabilityRows = await prisma.capability.findMany();
+    const bandRows = await prisma.band.findMany();
 
     const capabilityMap = Object.fromEntries(
-        capabilitiesRows.map((capability) => [capability.capabilityName, capability.capabilityId])
+        capabilityRows.map((capability) => [capability.capabilityName, capability.capabilityId])
     );
 
     const bandMap = Object.fromEntries(
-        bandsRows.map((band) => [band.bandName, band.bandId])
+        bandRows.map((band) => [band.bandName, band.bandId])
     );
 
     await prisma.jobRole.createMany({
