@@ -47,5 +47,8 @@
   },
   "vitest": {
     "environment": "node"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }
