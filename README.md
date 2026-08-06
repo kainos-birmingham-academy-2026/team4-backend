@@ -18,6 +18,7 @@
 - `npm run lint`: runs the linter and flags any issues
 - `npm run lint:fix`: runs the linter and performs any safe fixes
 
+
 ## API 
 The API should run at `http://localhost:3000`.
 `http://localhost:3000/health` should display the current time. 
@@ -29,11 +30,17 @@ Wrtie this command to run the PostgreSQL database:
 docker run --name jobRoles-db -e POSTGRES_PASSWORD=password -e POSTGRES_DB=jobRoles -p 5432:5432 -d postgres
 ```
 
-## Initialise Prisma
-Add an `.env` file and put this database URL connection string in the file:
+## Database Setup
+Add an `.env` file to the root folder of the project and put this database URL connection string in the file:
 
 ```bash
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/jobRoles"
 ```
 
 Make sure to change the USER and PASSWORD to your database username and password.
+
+## Database commands
+- `npx prisma migrate dev --name init`: creates `prisma/migrations/` with SQL migration files, applies the migration to the databases, and runs `prisma generate` to create the tables
+- `npx prisma db seed`: seeds the database with initial data
+- `npx prisma migrate reset`: drops the database, re-runs all migrations, and calls `db seed` automatically
+- `npx prisma studio`: opens Prisma Studio in your browser to browse all tables
