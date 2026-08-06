@@ -5,7 +5,7 @@ import type { Request, Response } from "express";
 export class JobRoleController {
   constructor(private readonly jobRoleService: JobRoleService = new JobRoleService()) {}
 
-  async getAllJobRoles(req: Request, res: Response): Promise<void> {
+  async getAllJobRoles(_req: Request, res: Response): Promise<void> {
 
     try {
         let jobRoles: JobRoleResponse[] = [];
