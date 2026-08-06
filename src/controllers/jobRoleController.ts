@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { JobRoleService } from "../services/jobRoleService";
-import prisma from "../prismaClient";
 import { JobRoleResponse } from "../dtos/jobRoleDto";
 import { JobRoleMapper } from "../mappers/jobRoleMapper";
-import { JobRole } from "../models/jobRole";
+import type { JobRole } from "@prisma/client";
 
 export class JobRoleController {
   constructor(private readonly jobRoleService: JobRoleService = new JobRoleService()) {}

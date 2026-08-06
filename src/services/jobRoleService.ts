@@ -1,7 +1,7 @@
 import { JobRoleResponse } from "../dtos/jobRoleDto";
 import { JobRoleMapper } from "../mappers/jobRoleMapper";
 import { Request, Response } from "express";
-import { JobRole } from "../models/jobRole";
+import type { JobRole } from "@prisma/client";
 import prisma from "../prismaClient";
 
 
