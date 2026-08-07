@@ -26,13 +26,13 @@ The API should run at `http://localhost:4000`.
 
 
 ## Docker Setup
-Wrtie this command to run the PostgreSQL database:
+Write this command to run the PostgreSQL database:
 ```bash
 docker run --name jobRoles-db -e POSTGRES_PASSWORD=password -e POSTGRES_DB=jobRoles -p 5432:5432 -d postgres
 ```
 
 ## Database Setup
-Add an `.env` file to the root folder of the project and put this database URL connection string in the file:
+Add the `.env` file to the root folder of the project and put this database URL connection string in the file:
 
 ```bash
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/jobRoles"
