@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { app } from "./app.js";
 
-const PORT = process.env.PORT || 4000;
+const PORT = parseInt(process.env.PORT || "4000");
 // Middleware
 app.use(express.json());
 
@@ -17,7 +17,7 @@ app.get("/health", (_req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
 	console.log(`🚀 Server running on http://localhost:${PORT}`);
 	console.log(`📝 Try: http://localhost:${PORT}/health`);
 });
