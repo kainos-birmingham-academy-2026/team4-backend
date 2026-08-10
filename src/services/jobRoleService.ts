@@ -12,4 +12,12 @@ export class JobRoleService {
         const jobRoleResponses = await Promise.all(jobRoles.map(jobRole => this.jobRoleMapper.mapJobRoleToResponse(jobRole)));
         return jobRoleResponses;
     }
+
+    async findJobRoleById(id: number): Promise<JobRoleResponse | null> {
+        const jobRole = await prisma.jobRole.findUnique({ where: { jobRoleId: id } });
+        if (!jobRole) {
+            return null;
+        }
+        return this.jobRoleMapper.mapJobRoleToDetailedResponse(jobRole);
+    }
 }

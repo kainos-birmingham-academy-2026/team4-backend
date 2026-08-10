@@ -1,5 +1,5 @@
 import type { JobRole } from "@prisma/client";
-import { JobRoleResponse } from "../dtos/jobRoleDto.js";
+import { JobRoleResponse, JobRoleDetailedResponse } from "../dtos/jobRoleDto.js";
 import prisma from "../prismaClient.js";
 
 
@@ -21,16 +21,46 @@ export class JobRoleMapper {
         return band?.bandName || "Unknown";
     }
 
+    private async getStatusName(statusId: number): Promise<string> {
+        const status = await prisma.status.findUnique({
+            where: { statusId },
+            select: { statusName: true },
+        });
+        return status?.statusName || "Unknown";
+    }
+
+
     async mapJobRoleToResponse(jobRole: JobRole): Promise<JobRoleResponse> {
         const capabilityName = await this.getCapabilityName(jobRole.capabilityId);
         const bandName = await this.getBandName(jobRole.bandId);
+        const status = await this.getStatusName(jobRole.statusId);
 
         return new JobRoleResponse(
             jobRole.roleName,
             jobRole.location,
             capabilityName,
             bandName,
-            jobRole.closingDate
+            jobRole.closingDate,
+            status
+        );
+    }
+
+    async mapJobRoleToDetailedResponse(jobRole: JobRole): Promise<JobRoleDetailedResponse> {
+        const capabilityName = await this.getCapabilityName(jobRole.capabilityId);
+        const bandName = await this.getBandName(jobRole.bandId);
+        const status = await this.getStatusName(jobRole.statusId);
+
+        return new JobRoleDetailedResponse(
+            jobRole.roleName,
+            jobRole.location,
+            capabilityName,
+            bandName,
+            jobRole.closingDate,
+            status,
+            jobRole.description,
+            jobRole.responsibilities,
+            jobRole.sharepointUrl,
+            jobRole.numberOfOpenPositions
         );
     }
 
