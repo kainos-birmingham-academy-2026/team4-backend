@@ -38,7 +38,8 @@ async function main() {
         "Consultant",
         "Manager",
         "Principal",
-        "Leader"
+        "Leader",
+        "Executive"
     ];
 
     await prisma.user.upsert({
@@ -104,6 +105,22 @@ async function main() {
                 capabilityId: capabilityMap["Data & AI"],
                 bandId: bandMap.Consultant,
                 closingDate: new Date("2026-12-16"),
+                status: "Open"
+            },
+            {
+                roleName: "Low Code Solution Architect",
+                location: "Gdansk",
+                capabilityId: capabilityMap.Engineering,
+                bandId: bandMap.Manager,
+                closingDate: new Date("2026-11-30"),
+                status: "Open"
+            },
+            {
+                roleName: "Talent Acquisition Partner",
+                location: "Belfast",
+                capabilityId: capabilityMap.People,
+                bandId: bandMap["Senior Associate"],
+                closingDate: new Date("2026-10-15"),
                 status: "Open"
             }
         ],
