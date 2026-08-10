@@ -4,10 +4,14 @@ import { AuthService } from "../services/authService.js";
 import { AuthSchema } from "../dtos/authDto.js";
 import { validateBody } from "../middlewares/validate.js";
 
-const router = Router();
-const controller = new AuthController(new AuthService());
+export const createAuthRouter = (authService?: AuthService): Router => {
+    const router = Router();
+    const controller = new AuthController(authService ?? new AuthService());
 
-router.post("/login", validateBody(AuthSchema), controller.login.bind(controller));
-router.post("/register", validateBody(AuthSchema), controller.register.bind(controller));
+    router.post("/login", validateBody(AuthSchema), controller.login.bind(controller));
+    router.post("/register", validateBody(AuthSchema), controller.register.bind(controller));
 
-export default router;
+    return router;
+};
+
+export default createAuthRouter();

@@ -11,6 +11,11 @@ const mockFindAllJobRoles = vi.fn().mockResolvedValue(mockJobRoles);
 const mockService = new (vi.mocked(JobRoleService))();
 
 
+const testApp = express();
+testApp.use(express.json());
+testApp.use(express.urlencoded({ extended: true }));
+testApp.use("/api/job-roles", createJobRoleRouter(mockService));
+
 describe("GET /api/job-roles", async () => {
 
     beforeEach(() => {
@@ -20,10 +25,6 @@ describe("GET /api/job-roles", async () => {
     it("should return all open job roles with status 200", async () => {
 
         mockService.findAllJobRoles = mockFindAllJobRoles;
-
-        const router = createJobRoleRouter(mockService);
-        const testApp = express();
-        testApp.use("/api/job-roles", router);
         
         const response = await request(testApp).get("/api/job-roles/");
 
