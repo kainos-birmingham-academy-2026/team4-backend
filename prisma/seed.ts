@@ -10,7 +10,7 @@ async function main() {
     await prisma.band.deleteMany();
 
     
-    const passwordHash = await argon2.hash("password123!");
+    const passwordHash = await argon2.hash("Password123!");
 
     // Seed capabilities and bands arrays
     const capabilities = [
