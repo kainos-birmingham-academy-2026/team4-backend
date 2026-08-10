@@ -18,6 +18,15 @@
 - `npm run lint`: runs the linter and flags any issues
 - `npm run lint:fix`: runs the linter and performs any safe fixes
 
+## Git Hook Setup (Lefthook)
+
+Pre-commit hooks are installed automatically by `npm install` through the `prepare` script.
+
+You only need to run this manually if install scripts were skipped (for example, `npm install --ignore-scripts`):
+
+```bash
+npm run prepare
+```
 
 ## API 
 The API should run at `http://localhost:4000`.
