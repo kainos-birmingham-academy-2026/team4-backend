@@ -4,6 +4,12 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+
+enum UserType {
+  USER
+  ADMIN
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -36,4 +42,13 @@ model Band {
   bandId Int @id @default(autoincrement())
   bandName String @unique
   jobRoles JobRole[]
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  passwordHash String
+  role UserType @default(USER)
+  createdAt DateTime @default(now())
+
 }
