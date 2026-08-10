@@ -37,6 +37,8 @@ async function main() {
         "Leader"
     ];
 
+    const statuses = ["Open", "Closed"];
+
     await prisma.capability.createMany({
         data: capabilities.map((capabilityName) => ({ capabilityName })),
         skipDuplicates: true
@@ -47,9 +49,15 @@ async function main() {
         skipDuplicates: true
     });
 
+    await prisma.status.createMany({
+        data: statuses.map((statusName) => ({ statusName })),
+        skipDuplicates: true
+    });
+
     // Read back for IDs
     const capabilityRows = await prisma.capability.findMany();
     const bandRows = await prisma.band.findMany();
+    const statusRows = await prisma.status.findMany();
 
     const capabilityMap = Object.fromEntries(
         capabilityRows.map((capability) => [capability.capabilityName, capability.capabilityId])
@@ -57,6 +65,10 @@ async function main() {
 
     const bandMap = Object.fromEntries(
         bandRows.map((band) => [band.bandName, band.bandId])
+    );
+
+    const statusMap = Object.fromEntries(
+        statusRows.map((status) => [status.statusName, status.statusId])
     );
 
     await prisma.jobRole.createMany({
@@ -67,7 +79,11 @@ async function main() {
                 capabilityId: capabilityMap.Engineering,
                 bandId: bandMap.Trainee,
                 closingDate: new Date("2026-10-22"),
-                status: "Open"
+                statusId: statusMap.Open,
+                description: "Responsible for developing and maintaining software applications.",
+                responsibilities: ["Write code", "Fix bugs", "Collaborate with team"],
+                sharepointUrl: "https://example.com/graduate-software-engineer",
+                numberOfOpenPositions: 5
             },
             {
                 roleName: "Senior Test Engineer",
@@ -75,7 +91,11 @@ async function main() {
                 capabilityId: capabilityMap.Engineering,
                 bandId: bandMap["Senior Associate"],
                 closingDate: new Date("2026-09-19"),
-                status: "Open"
+                statusId: statusMap.Open,
+                description: "Responsible for leading test engineering efforts.",
+                responsibilities: ["Design test plans", "Execute test cases", "Report defects"],
+                sharepointUrl: "https://example.com/senior-test-engineer",
+                numberOfOpenPositions: 2
             },
             {
                 roleName: "Associate Platform Engineer",
@@ -83,7 +103,11 @@ async function main() {
                 capabilityId: capabilityMap.Platforms,
                 bandId: bandMap.Associate,
                 closingDate: new Date("2026-10-13"),
-                status: "Open"
+                statusId: statusMap.Open,
+                description: "Responsible for supporting platform engineering tasks.",
+                responsibilities: ["Maintain platforms", "Support platform upgrades", "Monitor platform performance"],
+                sharepointUrl: "https://example.com/associate-platform-engineer",
+                numberOfOpenPositions: 3
             },
             {
                 roleName: "Lead Data Engineer",
@@ -91,7 +115,11 @@ async function main() {
                 capabilityId: capabilityMap["Data & AI"],
                 bandId: bandMap.Consultant,
                 closingDate: new Date("2026-12-16"),
-                status: "Open"
+                statusId: statusMap.Closed,
+                description: "Responsible for leading data engineering initiatives.",
+                responsibilities: ["Design data pipelines", "Implement data solutions", "Mentor junior engineers"],
+                sharepointUrl: "https://example.com/lead-data-engineer",
+                numberOfOpenPositions: 0
             }
         ],
         skipDuplicates: true
