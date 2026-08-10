@@ -32,11 +32,12 @@ docker run --name jobRoles-db -e POSTGRES_PASSWORD=password -e POSTGRES_DB=jobRo
 ```
 
 ## Database and Port Setup
-Add the `.env` file to the root folder of the project and put these strings in the file:
+Add the `.env` file to the root folder of the project and put these values in the file:
 
 ```bash
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/jobRoles"
 PORT=4000
+JWT_SECRET=<generate_a_random_value>
 ```
 
 Make sure to change the USER and PASSWORD to your database username and password.
