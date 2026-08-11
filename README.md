@@ -1,5 +1,23 @@
 # team4-backend
 
+## Prerequisites
+
+- Node.js 18+
+- npm
+- Docker Desktop (for full-stack setup)
+
+**Required Folder Structure:**
+
+Both `team4-backend` and `team4-frontend` must be cloned in the same parent folder:
+
+```
+parent-folder/
+  team4-backend/     ← This repository
+  team4-frontend/    ← Related repository
+```
+
+This structure is required for the Docker Compose setup to work correctly.
+
 ## Install
 - `npm install`: installs all the dependencies
 
