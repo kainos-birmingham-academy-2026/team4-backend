@@ -6,6 +6,9 @@ import { JobRoleService } from "../../src/services/jobRoleService";
 import { mockJobRole1, mockJobRoles } from "../mockJobRoles";
 
 vi.mock("../../src/services/jobRoleService");
+vi.mock("../../src/middlewares/requireAuth", () => ({
+	requireAuth: vi.fn((req, res, next) => next()),
+}));
 
 const mockFindAllJobRoles = vi.fn().mockResolvedValue(mockJobRoles);
 const mockService = new (vi.mocked(JobRoleService))();
@@ -70,6 +73,15 @@ describe("GET /api/job-roles/:id", async () => {
 		expect(response.status).toBe(400);
 		expect(response.body).toEqual([
 			{ field: "id", message: "Invalid input: expected number, received NaN" },
+		]);
+	});
+
+	it("should return status 400 when the id isn't positive", async () => {
+		const response = await request(testApp).get(`/api/job-roles/0`);
+
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual([
+			{ field: "id", message: "ID must be a positive integer" },
 		]);
 	});
 });

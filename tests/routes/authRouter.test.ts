@@ -65,6 +65,18 @@ describe("POST /auth/login", async () => {
 		expect(mockLogin).toHaveBeenCalledWith(mockBody);
 		expect(response.body).toEqual({ error: "Internal server error" });
 	});
+
+	it("should return status 400 when login fails due to validation errors", async () => {
+		mockAuthService.login = mockLogin.mockRejectedValue(
+			new AuthError(400, "Validation error"),
+		);
+
+		const response = await request(testApp).post("/auth/login").send(mockBody);
+
+		expect(response.status).toBe(400);
+		expect(mockLogin).toHaveBeenCalledWith(mockBody);
+		expect(response.body).toEqual({ error: "Validation error" });
+	});
 });
 
 describe("POST /auth/register", async () => {
