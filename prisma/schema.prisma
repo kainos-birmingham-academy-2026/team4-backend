@@ -28,10 +28,16 @@ model JobRole {
   capabilityId Int  
   bandId      Int
   closingDate  DateTime?
-  status      String
+  statusId     Int
+  description  String
+  responsibilities String[]
+  sharepointUrl String
+  numberOfOpenPositions Int
+
 
   capability Capability @relation(fields: [capabilityId], references: [capabilityId])
   band      Band       @relation(fields: [bandId], references: [bandId])
+  status    Status     @relation(fields: [statusId], references: [statusId])
 }
 
 model Capability {
@@ -46,11 +52,16 @@ model Band {
   jobRoles JobRole[]
 }
 
+model Status {
+  statusId Int @id @default(autoincrement())
+  statusName String @unique
+  jobRoles JobRole[]
+}
+
 model User {
   id Int @id @default(autoincrement())
   email String @unique
   passwordHash String
   role UserType @default(USER)
   createdAt DateTime @default(now())
-
 }
