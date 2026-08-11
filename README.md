@@ -50,8 +50,19 @@ npm run prepare
 The API should run at `http://localhost:4000`.
 `http://localhost:4000/health` should display the current time. 
 `http://localhost:4000/api/job-roles` should return a JSON object containing a list of open job roles.
+`http://localhost:4000/api/job-roles/:id` should return a JSON object detailing a specific job role.
 `http://localhost:4000/auth/login` handles login requests.
 `http://localhost:4000/auth/register` handles registration requests.
+
+A client must be logged in to send requests to the job role pages. To log in:
+1. Send a POST request to `/auth/login` with this body:
+```JSON
+{
+   "email": "test1@example.com",
+   "password": "Password123!"
+}
+```
+You should receive a token in response. In future requests to `/api/job-roles` or similar pages, add an Authorization header with the value `Bearer <token>`.
 
 
 ## Environment Setup
