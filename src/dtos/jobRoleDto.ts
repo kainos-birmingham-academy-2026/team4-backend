@@ -6,6 +6,7 @@ export const IdParamSchema = z.object({
 
 export class JobRoleResponse {
     constructor(
+        public readonly jobRoleId: number,
         public readonly roleName: string,
         public readonly location: string,
         public readonly capability: string,
@@ -21,6 +22,7 @@ export class JobRoleResponse {
 
 export class JobRoleDetailedResponse extends JobRoleResponse {
     constructor(
+        jobRoleId: number,
         roleName: string,
         location: string,
         capability: string,
@@ -32,7 +34,7 @@ export class JobRoleDetailedResponse extends JobRoleResponse {
         public readonly sharepointUrl: string,
         public readonly numberOfOpenPositions: number
     ) {
-        super(roleName, location, capability, band, closingDate, status);
+        super(jobRoleId, roleName, location, capability, band, closingDate, status);
     }
 }
 

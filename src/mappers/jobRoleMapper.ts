@@ -36,6 +36,7 @@ export class JobRoleMapper {
         const status = await this.getStatusName(jobRole.statusId);
 
         return new JobRoleResponse(
+            jobRole.jobRoleId,
             jobRole.roleName,
             jobRole.location,
             capabilityName,
@@ -51,6 +52,7 @@ export class JobRoleMapper {
         const status = await this.getStatusName(jobRole.statusId);
 
         return new JobRoleDetailedResponse(
+            jobRole.jobRoleId,
             jobRole.roleName,
             jobRole.location,
             capabilityName,
