@@ -34,7 +34,8 @@ async function main() {
         "Consultant",
         "Manager",
         "Principal",
-        "Leader"
+        "Leader",
+        "Executive"
     ];
 
     const statuses = ["Open", "Closed"];
