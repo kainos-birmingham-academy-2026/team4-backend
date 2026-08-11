@@ -83,6 +83,20 @@ describe("AuthService - login", () => {
 			new AuthError(401, "Invalid email or password"),
 		);
 	});
+
+	it("should throw an error when JWT_SECRET is not configured", async () => {
+		vi.unstubAllEnvs();
+		vi.mocked(argon2).verify = vi.fn().mockResolvedValue(true);
+		vi.mocked(prisma).user.findUnique = vi.fn().mockResolvedValue(mockUser);
+
+		const result = authService.login({
+			email: mockUser.email,
+			password: mockUser.password,
+		});
+		await expect(result).rejects.toThrow(
+			new Error("JWT_SECRET has not been configured"),
+		);
+	});
 });
 
 describe("AuthService - register", () => {
