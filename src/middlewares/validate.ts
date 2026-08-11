@@ -1,5 +1,5 @@
-import { RequestHandler } from "express";
-import { z, ZodSchema } from "zod";
+import type { RequestHandler } from "express";
+import type { z, ZodSchema } from "zod";
 
 export function formatZodError(error: z.ZodError) {
     return error.issues.map(issue => ({
