@@ -50,7 +50,19 @@ npm run prepare
 The API should run at `http://localhost:4000`.
 `http://localhost:4000/health` should display the current time. 
 `http://localhost:4000/api/job-roles` should return a JSON object containing a list of open job roles.
+`http://localhost:4000/auth/login` handles login requests.
+`http://localhost:4000/auth/register` handles registration requests.
 
+
+## Environment Setup
+Add the `.env` file to the root folder of the project and put these values in the file:
+
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/jobRoles"
+PORT=4000
+JWT_SECRET=<generate_a_random_value>
+```
+Make sure the USERNAME and PASSWORD match your own database username and password.
 
 ## Docker Compose (Full-Stack Setup)
 
@@ -72,7 +84,7 @@ For a complete development environment with backend + database + frontend, use t
      team4-frontend/
        compose.yaml  ← Here
    ```
-
+   
 2. Start the full stack:
    ```bash
    cd ../team4-frontend
@@ -109,7 +121,6 @@ The `-v` flag removes volumes (including the database), allowing you to run `doc
 4. Seed database: `npx prisma db seed`
 5. Start dev server: `npm run dev`
 
-Make sure to change the USER and PASSWORD to your database username and password.
 
 ## Database commands
 - `npx prisma migrate dev --name init`: creates `prisma/migrations/` with SQL migration files, applies the migration to the databases, and runs `prisma generate` to create the tables
