@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import argon2 from "argon2";
 
 const prisma = new PrismaClient();
 
@@ -7,6 +8,9 @@ async function main() {
     await prisma.jobRole.deleteMany();
     await prisma.capability.deleteMany();
     await prisma.band.deleteMany();
+
+    
+    const passwordHash = await argon2.hash("Password123!");
 
     // Seed capabilities and bands arrays
     const capabilities = [
@@ -34,8 +38,18 @@ async function main() {
         "Consultant",
         "Manager",
         "Principal",
-        "Leader"
+        "Leader",
+        "Executive"
     ];
+
+    await prisma.user.upsert({
+        where: { email: "test1@example.com"},
+        update: {},
+        create: {
+            email: "test1@example.com",
+            passwordHash
+        }
+    })
 
     await prisma.capability.createMany({
         data: capabilities.map((capabilityName) => ({ capabilityName })),
@@ -91,6 +105,22 @@ async function main() {
                 capabilityId: capabilityMap["Data & AI"],
                 bandId: bandMap.Consultant,
                 closingDate: new Date("2026-12-16"),
+                status: "Open"
+            },
+            {
+                roleName: "Low Code Solution Architect",
+                location: "Gdansk",
+                capabilityId: capabilityMap.Engineering,
+                bandId: bandMap.Manager,
+                closingDate: new Date("2026-11-30"),
+                status: "Open"
+            },
+            {
+                roleName: "Talent Acquisition Partner",
+                location: "Belfast",
+                capabilityId: capabilityMap.People,
+                bandId: bandMap["Senior Associate"],
+                closingDate: new Date("2026-10-15"),
                 status: "Open"
             }
         ],
