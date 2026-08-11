@@ -1,5 +1,5 @@
 import type { JobRole } from "@prisma/client";
-import type { JobRoleResponse } from "../dtos/jobRoleDto.js";
+import type { JobRoleDetailedResponse, JobRoleResponse } from "../dtos/jobRoleDto.js";
 import { JobRoleMapper } from "../mappers/jobRoleMapper.js";
 import prisma from "../prismaClient.js";
 
@@ -13,7 +13,7 @@ export class JobRoleService {
         return jobRoleResponses;
     }
 
-    async findJobRoleById(id: number): Promise<JobRoleResponse | null> {
+    async findJobRoleById(id: number): Promise<JobRoleDetailedResponse | null> {
         const jobRole = await prisma.jobRole.findUnique({ where: { jobRoleId: id } });
         if (!jobRole) {
             return null;
