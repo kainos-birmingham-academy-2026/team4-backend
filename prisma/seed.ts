@@ -34,7 +34,8 @@ async function main() {
         "Consultant",
         "Manager",
         "Principal",
-        "Leader"
+        "Leader",
+        "Executive"
     ];
 
     const statuses = ["Open", "Closed"];
@@ -120,6 +121,30 @@ async function main() {
                 responsibilities: ["Design data pipelines", "Implement data solutions", "Mentor junior engineers"],
                 sharepointUrl: "https://example.com/lead-data-engineer",
                 numberOfOpenPositions: 0
+            },
+            {
+                roleName: "Low Code Solution Architect",
+                location: "Gdansk",
+                capabilityId: capabilityMap.Engineering,
+                bandId: bandMap.Manager,
+                closingDate: new Date("2026-11-30"),
+                statusId: statusMap.Open,
+                description: "Responsible for managing low code solutions.",
+                responsibilities: ["Design low code solutions", "Implement low code solutions", "Mentor junior engineers"],
+                sharepointUrl: "https://example.com/low-code-solution-architect",
+                numberOfOpenPositions: 5
+            },
+            {
+                roleName: "Talent Acquisition Partner",
+                location: "Belfast",
+                capabilityId: capabilityMap.People,
+                bandId: bandMap["Senior Associate"],
+                closingDate: new Date("2026-10-15"),
+                statusId: statusMap.Open,
+                description: "Responsible for talent acquisition and recruitment.",
+                responsibilities: ["Source candidates", "Conduct interviews", "Manage recruitment process"],
+                sharepointUrl: "https://example.com/talent-acquisition-partner",
+                numberOfOpenPositions: 2
             }
         ],
         skipDuplicates: true
