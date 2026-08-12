@@ -129,7 +129,7 @@ export class ChatService {
 		if (this.isCapabilityExplanationQuestion(normalized)) {
 			return {
 				message:
-					"A role family is the main discipline or team a role belongs to, such as Engineering, Platform, People Operations, Data & AI, Product Consultant, Quality, or Cybersecurity. It helps group similar jobs so you can find roles that match your strengths.",
+					"A capability is the main discipline or team a role belongs to, such as Engineering, Platform, People Operations, Data & AI, Product Consultant, Quality, or Cybersecurity. It helps group similar jobs so you can find roles that match your strengths.",
 				recommendations: this.pickCapabilityExamples(scopedRoles),
 				intent: "explain",
 				confidence: "high",
@@ -145,12 +145,14 @@ export class ChatService {
 			scopedRoles,
 		);
 
+		// Case 1: Found matching roles
 		if (rankedRoles.length > 0) {
 			const recommendations = rankedRoles
 				.slice(0, 3)
 				.map((rankedRole) =>
 					this.mapRecommendation(rankedRole.role, rankedRole.reasons[0]),
 				);
+			recommendations.push(this.createExploreAllButton());
 
 			return {
 				message:
@@ -161,29 +163,48 @@ export class ChatService {
 			};
 		}
 
-		const fallbackRecommendations = scopedRoles
-			.slice(0, 3)
-			.map((role) =>
-				this.mapRecommendation(
-					role,
-					"This is an open role you can use as a starting point while you refine your preferences.",
-				),
+		// Case 2: Capability detected but no open roles available
+		if (capability) {
+			const capabilityExistsInAllRoles = roles.some((role) =>
+				this.matchesRoleFamily(role, capability),
 			);
 
+			if (capabilityExistsInAllRoles) {
+				return {
+					message: `We have ${capability} roles, but unfortunately none are currently open. You can browse all roles or check back soon for new openings.`,
+					recommendations: [this.createExploreAllButton()],
+					intent: "search",
+					confidence: "medium",
+				};
+			}
+		}
+
+		// Case 3: No capability detected - help if uncertain
 		if (this.isUncertain(normalized)) {
+			const fallbackRecommendations = scopedRoles
+				.slice(0, 3)
+				.map((role) =>
+					this.mapRecommendation(
+						role,
+						"This is an open role you can use as a starting point.",
+					),
+				);
+			fallbackRecommendations.push(this.createExploreAllButton());
+
 			return {
 				message:
-					"No problem. Tell me what you enjoy, such as building apps, platform/cloud work, people-focused work, data & AI, product consulting, QA/testing, or cybersecurity, and I can recommend a role family.",
+					"No problem. Tell me what you enjoy, such as building apps, platform/cloud work, people-focused work, data & AI, product consulting, QA/testing, or cybersecurity, and I can recommend a capability.",
 				recommendations: fallbackRecommendations,
 				intent: "recommend",
 				confidence: "medium",
 			};
 		}
 
+		// Case 4: Unrecognized keyword
 		return {
 			message:
-				"I did not fully understand that yet. Try asking about capabilities, locations, or interests, or browse all open roles.",
-			recommendations: [],
+				"I did not fully understand that yet. Try asking about capabilities, locations, or interests.",
+			recommendations: [this.createExploreAllButton()],
 			intent: "clarify",
 			confidence: "medium",
 		};
@@ -260,7 +281,7 @@ export class ChatService {
 
 				if (capabilityHint && this.matchesRoleFamily(role, capabilityHint)) {
 					score += 8;
-					reasons.push(`it matches the ${capabilityHint} role family`);
+					reasons.push(`it matches the ${capabilityHint} capability`);
 				}
 
 				if (
@@ -293,12 +314,9 @@ export class ChatService {
 
 	private isCapabilityExplanationQuestion(message: string): boolean {
 		return (
-			message.includes("what does role family mean") ||
-			message.includes("what is role family") ||
-			message.includes("define role family") ||
-			message.includes("explain role family") ||
 			message.includes("what does capability mean") ||
 			message.includes("what is capability") ||
+			message.includes("what are capabilities") ||
 			message.includes("define capability") ||
 			message.includes("explain capability")
 		);
@@ -336,6 +354,7 @@ export class ChatService {
 	private mapRecommendation(
 		role: JobRoleResponse,
 		whyRecommended: string,
+		url?: string,
 	): ChatRecommendation {
 		return {
 			jobRoleId: role.jobRoleId,
@@ -345,6 +364,16 @@ export class ChatService {
 			band: role.band,
 			status: role.status,
 			whyRecommended,
+			url,
+		};
+	}
+
+	private createExploreAllButton(): ChatRecommendation {
+		return {
+			roleName: "Browse all open roles",
+			whyRecommended:
+				"Explore all available positions and filter by your preferences.",
+			url: "/job-roles",
 		};
 	}
 }

@@ -5,13 +5,14 @@ export const ChatRequestSchema = z.object({
 });
 
 export interface ChatRecommendation {
-	jobRoleId: number;
-	roleName: string;
-	location: string;
-	capability: string;
-	band: string;
-	status: string;
-	whyRecommended: string;
+	jobRoleId?: number;
+	roleName?: string;
+	location?: string;
+	capability?: string;
+	band?: string;
+	status?: string;
+	whyRecommended?: string;
+	url?: string;
 }
 
 export interface ChatResponseDto {
