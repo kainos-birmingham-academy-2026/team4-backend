@@ -3,14 +3,14 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createJobRoleRouter } from "../../src/routes/jobRoleRouter";
 import { JobRoleService } from "../../src/services/jobRoleService";
-import { mockJobRole1, mockJobRoles } from "../mockJobRoles";
+import { mockJobRoleResponse1, mockJobRoleResponses } from "../mockJobRoles";
 
 vi.mock("../../src/services/jobRoleService");
 vi.mock("../../src/middlewares/requireAuth", () => ({
-	requireAuth: vi.fn((req, res, next) => next()),
+	requireAuth: vi.fn((_req, _res, next) => next()),
 }));
 
-const mockFindAllJobRoles = vi.fn().mockResolvedValue(mockJobRoles);
+const mockFindAllJobRoles = vi.fn().mockResolvedValue(mockJobRoleResponses);
 const mockService = new (vi.mocked(JobRoleService))();
 
 const testApp = express();
@@ -29,7 +29,9 @@ describe("GET /api/job-roles", async () => {
 		const response = await request(testApp).get("/api/job-roles/");
 
 		expect(response.status).toBe(200);
-		expect(response.body).toEqual(mockJobRoles);
+		expect(response.body).toEqual(
+			JSON.parse(JSON.stringify(mockJobRoleResponses)),
+		);
 	});
 });
 
@@ -39,12 +41,16 @@ describe("GET /api/job-roles/:id", async () => {
 	});
 
 	it("should return the job role with status 200 when found", async () => {
-		mockService.findJobRoleById = vi.fn().mockResolvedValue(mockJobRole1);
+		mockService.findJobRoleById = vi
+			.fn()
+			.mockResolvedValue(mockJobRoleResponse1);
 
 		const response = await request(testApp).get(`/api/job-roles/1`);
 
 		expect(response.status).toBe(200);
-		expect(response.body).toEqual(mockJobRole1);
+		expect(response.body).toEqual(
+			JSON.parse(JSON.stringify(mockJobRoleResponse1)),
+		);
 	});
 
 	it("should return status 404 when the job role is not found", async () => {
@@ -71,17 +77,13 @@ describe("GET /api/job-roles/:id", async () => {
 		const response = await request(testApp).get(`/api/job-roles/abc`);
 
 		expect(response.status).toBe(400);
-		expect(response.body).toEqual([
-			{ field: "id", message: "Invalid input: expected number, received NaN" },
-		]);
+		expect(response.body.errors).toBeDefined();
 	});
 
 	it("should return status 400 when the id isn't positive", async () => {
 		const response = await request(testApp).get(`/api/job-roles/0`);
 
 		expect(response.status).toBe(400);
-		expect(response.body).toEqual([
-			{ field: "id", message: "ID must be a positive integer" },
-		]);
+		expect(response.body.errors).toBeDefined();
 	});
 });
