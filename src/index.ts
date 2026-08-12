@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { app } from "./app.js";
 
-const PORT = parseInt(process.env.PORT || "4000");
+const PORT = parseInt(process.env.PORT || "4000", 10);
 // Middleware
 app.use(express.json());
 
