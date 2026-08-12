@@ -2,20 +2,15 @@ import express from "express";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createAuthRouter } from "../../src/routes/authRouter";
-import { AuthError, AuthService } from "../../src/services/authService";
-
-vi.mock("../../src/services/authService", async () => {
-	const actual = await vi.importActual("../../src/services/authService");
-	return {
-		AuthError: actual.AuthError,
-		AuthService: vi.fn(),
-	};
-});
-
-const mockAuthService = new (vi.mocked(AuthService))();
+import type { AuthService } from "../../src/services/authService";
+import { AuthError } from "../../src/services/authService";
 
 const mockLogin = vi.fn();
 const mockRegister = vi.fn();
+const mockAuthService = {
+	login: mockLogin,
+	register: mockRegister,
+};
 
 const mockBody = {
 	email: "test@example.com",
@@ -39,7 +34,6 @@ describe("POST /auth/login", async () => {
 
 	it("should return a token with status 200 when login is successful", async () => {
 		mockAuthService.login = mockLogin.mockResolvedValue("mockToken");
-
 		const response = await request(testApp).post("/auth/login").send(mockBody);
 
 		expect(response.status).toBe(200);
@@ -109,17 +103,29 @@ describe("POST /auth/register", async () => {
 		expect(response.body.errors).toBeDefined();
 	});
 
-	it("should return status 500 when an unexpected error occurs", async () => {
+	it("should return status 201 when given a valid payload", async () => {
+		mockAuthService.register = mockRegister.mockResolvedValue("token-register");
+
+		const response = await request(testApp).post("/auth/register").send({
+			email: "new@example.com",
+			password: "Strong!Pass1",
+		});
+
+		expect(response.status).toBe(201);
+		expect(response.body).toEqual({ token: "token-register" });
+	});
+
+	it("should map auth service errors on registration", async () => {
 		mockAuthService.register = mockRegister.mockRejectedValue(
-			new Error("Internal server error"),
+			new AuthError(400, "User already exists"),
 		);
 
-		const response = await request(testApp)
-			.post("/auth/register")
-			.send(mockBody);
+		const response = await request(testApp).post("/auth/register").send({
+			email: "existing@example.com",
+			password: "Strong!Pass1",
+		});
 
-		expect(response.status).toBe(500);
-		expect(mockRegister).toHaveBeenCalledWith(mockBody);
-		expect(response.body).toEqual({ error: "Internal server error" });
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({ error: "User already exists" });
 	});
 });

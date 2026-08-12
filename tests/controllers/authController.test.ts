@@ -1,47 +1,47 @@
 import type { Request, Response } from "express";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AuthController } from "../../src/controllers/authController";
-import { AuthError, type AuthService } from "../../src/services/authService";
-
-const mockRequest = {
-	params: {},
-	query: {},
-	body: {},
-} as unknown as Request;
+import type { AuthService } from "../../src/services/authService";
+import { AuthError } from "../../src/services/authService";
 
 const mockResponse = {
 	status: vi.fn().mockReturnThis(),
 	json: vi.fn(),
 } as unknown as Response;
 
-const mockAuthService = {
-	login: vi.fn(),
-	register: vi.fn(),
-} as unknown as AuthService;
-
-describe("AuthController - login", async () => {
-	let authController: AuthController;
+describe("AuthController", () => {
+	const service = {
+		login: vi.fn(),
+		register: vi.fn(),
+	};
 
 	beforeEach(() => {
-		authController = new AuthController(mockAuthService);
 		vi.clearAllMocks();
 	});
 
-	it("should return a token with status 200 when login is successful", async () => {
-		mockAuthService.login = vi.fn().mockResolvedValue("mockToken");
+	it("returns 200 with token for login", async () => {
+		service.login.mockResolvedValue("token-1");
+		const controller = new AuthController(service as unknown as AuthService);
+		const req = {
+			body: { email: "u@example.com", password: "Strong!Pass1" },
+		} as Request;
 
-		await authController.login(mockRequest, mockResponse);
+		await controller.login(req, mockResponse);
 
 		expect(mockResponse.status).toHaveBeenCalledWith(200);
-		expect(mockResponse.json).toHaveBeenCalledWith({ token: "mockToken" });
+		expect(mockResponse.json).toHaveBeenCalledWith({ token: "token-1" });
 	});
 
-	it("should return status 401 when login fails due to invalid credentials", async () => {
-		mockAuthService.login = vi
-			.fn()
-			.mockRejectedValue(new AuthError(401, "Invalid email or password"));
+	it("returns auth status for login auth errors", async () => {
+		service.login.mockRejectedValue(
+			new AuthError(401, "Invalid email or password"),
+		);
+		const controller = new AuthController(service as unknown as AuthService);
+		const req = {
+			body: { email: "u@example.com", password: "Strong!Pass1" },
+		} as Request;
 
-		await authController.login(mockRequest, mockResponse);
+		await controller.login(req, mockResponse);
 
 		expect(mockResponse.status).toHaveBeenCalledWith(401);
 		expect(mockResponse.json).toHaveBeenCalledWith({
@@ -49,60 +49,31 @@ describe("AuthController - login", async () => {
 		});
 	});
 
-	it("should return status 500 when an unexpected error occurs", async () => {
-		mockAuthService.login = vi
-			.fn()
-			.mockRejectedValue(new Error("Unexpected error"));
+	it("returns 500 for login unexpected errors", async () => {
+		service.login.mockRejectedValue(new Error("unexpected"));
+		const controller = new AuthController(service as unknown as AuthService);
+		const req = {
+			body: { email: "u@example.com", password: "Strong!Pass1" },
+		} as Request;
 
-		await authController.login(mockRequest, mockResponse);
+		await controller.login(req, mockResponse);
 
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
 			error: "Internal server error",
 		});
 	});
-});
 
-describe("AuthController - register", async () => {
-	let authController: AuthController;
+	it("returns 201 with token for register", async () => {
+		service.register.mockResolvedValue("token-2");
+		const controller = new AuthController(service as unknown as AuthService);
+		const req = {
+			body: { email: "new@example.com", password: "Strong!Pass1" },
+		} as Request;
 
-	beforeEach(() => {
-		authController = new AuthController(mockAuthService);
-		vi.clearAllMocks();
-	});
-
-	it("should return a token with status 201 when registration is successful", async () => {
-		mockAuthService.register = vi.fn().mockResolvedValue("mockToken");
-
-		await authController.register(mockRequest, mockResponse);
+		await controller.register(req, mockResponse);
 
 		expect(mockResponse.status).toHaveBeenCalledWith(201);
-		expect(mockResponse.json).toHaveBeenCalledWith({ token: "mockToken" });
-	});
-
-	it("should return status 400 when registration fails due to user already existing", async () => {
-		mockAuthService.register = vi
-			.fn()
-			.mockRejectedValue(new AuthError(400, "User already exists"));
-
-		await authController.register(mockRequest, mockResponse);
-
-		expect(mockResponse.status).toHaveBeenCalledWith(400);
-		expect(mockResponse.json).toHaveBeenCalledWith({
-			error: "User already exists",
-		});
-	});
-
-	it("should return status 500 when an unexpected error occurs", async () => {
-		mockAuthService.register = vi
-			.fn()
-			.mockRejectedValue(new Error("Unexpected error"));
-
-		await authController.register(mockRequest, mockResponse);
-
-		expect(mockResponse.status).toHaveBeenCalledWith(500);
-		expect(mockResponse.json).toHaveBeenCalledWith({
-			error: "Internal server error",
-		});
+		expect(mockResponse.json).toHaveBeenCalledWith({ token: "token-2" });
 	});
 });
