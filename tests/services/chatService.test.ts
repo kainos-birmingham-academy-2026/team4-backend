@@ -104,4 +104,70 @@ describe("ChatService", () => {
 			"did not fully understand",
 		);
 	});
+
+	it("detects capability but has no open roles for that capability", async () => {
+		const closedDataRole = new JobRoleResponse(
+			4,
+			"Data Scientist",
+			"London",
+			"Data & AI",
+			"Band 3",
+			new Date("2026-12-10"),
+			"Closed",
+		);
+		const allRoles = [
+			new JobRoleResponse(
+				1,
+				"Software Engineer",
+				"Belfast",
+				"Engineering",
+				"Band 2",
+				new Date("2026-12-10"),
+				"Open",
+			),
+		];
+		const mockJobRoleService = {
+			findAllJobRoles: vi.fn().mockResolvedValue([...allRoles, closedDataRole]),
+		};
+		const chatService = new ChatService(mockJobRoleService);
+
+		const response = await chatService.getChatResponse("i like data");
+
+		expect(response.intent).toBe("search");
+		expect(response.message.toLowerCase()).toContain("unfortunately");
+		expect(response.recommendations.length).toBe(1);
+		expect(response.recommendations[0].url).toBe("/job-roles");
+	});
+
+	it("includes explore all roles button in successful recommendations", async () => {
+		const mockJobRoleService = {
+			findAllJobRoles: vi.fn().mockResolvedValue(jobRoles),
+		};
+		const chatService = new ChatService(mockJobRoleService);
+
+		const response = await chatService.getChatResponse("engineering roles");
+
+		expect(response.recommendations.length).toBeGreaterThan(1);
+		const lastRecommendation =
+			response.recommendations[response.recommendations.length - 1];
+		expect(lastRecommendation.url).toBe("/job-roles");
+		expect(lastRecommendation.roleName?.toLowerCase()).toContain("browse");
+	});
+
+	it("filters by location when mentioned", async () => {
+		const mockJobRoleService = {
+			findAllJobRoles: vi.fn().mockResolvedValue(jobRoles),
+		};
+		const chatService = new ChatService(mockJobRoleService);
+
+		const response = await chatService.getChatResponse(
+			"engineering roles in belfast",
+		);
+
+		expect(response.recommendations.length).toBeGreaterThan(0);
+		const belfastRoles = response.recommendations.filter((r) =>
+			r.location?.toLowerCase().includes("belfast"),
+		);
+		expect(belfastRoles.length).toBeGreaterThan(0);
+	});
 });
