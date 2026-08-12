@@ -98,7 +98,8 @@ describe("ChatService", () => {
 		const response = await chatService.getChatResponse("blorple?? maybe stuff");
 
 		expect(response.intent).toBe("clarify");
-		expect(response.recommendations).toEqual([]);
+		expect(response.recommendations.length).toBe(1);
+		expect(response.recommendations[0].url).toBe("/job-roles");
 		expect(response.message.toLowerCase()).toContain(
 			"did not fully understand",
 		);
