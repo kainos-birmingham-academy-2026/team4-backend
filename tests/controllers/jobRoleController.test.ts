@@ -18,6 +18,7 @@ const mockResponse = {
 const mockJobRoleService = {
 	findAllJobRoles: vi.fn(),
 	findJobRoleById: vi.fn(),
+	findPaginatedJobRoles: vi.fn(),
 } as unknown as JobRoleService;
 
 describe("JobRoleController - getAllJobRoles", async () => {
@@ -28,19 +29,67 @@ describe("JobRoleController - getAllJobRoles", async () => {
 		vi.clearAllMocks();
 	});
 
-	it("should return all open job roles with status 200", async () => {
-		mockJobRoleService.findAllJobRoles = vi
+	it("should return paginated job roles with default page 1 and status 200", async () => {
+		const mockPaginatedResponse = {
+			jobs: mockJobRoles,
+			totalCount: 25,
+		};
+		mockJobRoleService.findPaginatedJobRoles = vi
 			.fn()
-			.mockResolvedValue(mockJobRoles);
+			.mockResolvedValue(mockPaginatedResponse);
 
 		await jobRoleController.getAllJobRoles(mockRequest, mockResponse);
 
+		expect(mockJobRoleService.findPaginatedJobRoles).toHaveBeenCalledWith(
+			0,
+			10,
+		);
 		expect(mockResponse.status).toHaveBeenCalledWith(200);
-		expect(mockResponse.json).toHaveBeenCalledWith(mockJobRoles);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			jobs: mockJobRoles,
+			pagination: {
+				currentPage: 1,
+				totalPages: 3,
+				totalCount: 25,
+				pageSize: 10,
+				hasNext: true,
+				hasPrev: false,
+			},
+		});
+	});
+
+	it("should return paginated job roles for a specific page", async () => {
+		const mockRequest2 = { ...mockRequest, query: { page: "2" } };
+		const mockPaginatedResponse = {
+			jobs: [mockJobRoles[0]],
+			totalCount: 25,
+		};
+		mockJobRoleService.findPaginatedJobRoles = vi
+			.fn()
+			.mockResolvedValue(mockPaginatedResponse);
+
+		await jobRoleController.getAllJobRoles(mockRequest2, mockResponse);
+
+		expect(mockJobRoleService.findPaginatedJobRoles).toHaveBeenCalledWith(
+			10,
+			10,
+		);
+		expect(mockResponse.status).toHaveBeenCalledWith(200);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			jobs: [mockJobRoles[0]],
+			pagination: {
+				currentPage: 2,
+				totalPages: 3,
+				totalCount: 25,
+				pageSize: 10,
+				hasNext: true,
+				hasPrev: true,
+			},
+		});
 	});
 
 	it("should return status 500 when an error occurs", async () => {
-		mockJobRoleService.findAllJobRoles = vi
+		mockJobRoleService.findPaginatedJobRoles = vi
 			.fn()
 			.mockRejectedValue(new Error("Service error"));
 
