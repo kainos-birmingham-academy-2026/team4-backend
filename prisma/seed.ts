@@ -304,6 +304,356 @@ async function main() {
 					"https://kainossoftwareltd.sharepoint.com/sites/Career/JobProfiles/Business%20Services%20Support/Job%20profile%20-%20Business%20Support%20Consultant.pdf",
 				numberOfOpenPositions: 2,
 			},
+			{
+				roleName: "Apprentice Software Engineer",
+				location: "Belfast",
+				capabilityId: capabilityMap.Engineering,
+				bandId: bandMap.Apprentice,
+				closingDate: new Date("2026-10-26"),
+				statusId: statusMap.Open,
+				description:
+					"As an Apprentice Software Engineer with Kainos, you will work on projects where you can make a real difference to people's lives - the lives of people you know. extensive training to set you off on the right foot, you will quickly work as a part of a team in developing solutions within our real projects, learning all about our development languages, projects and technologies. You will be fully supported by experienced colleagues in the team as well as an experienced mentor, who will provide training and mentoring throughout your studies. You'll also get experience across a wide range of teams and projects, with built-in rotations to help you learn and work out which element of Software Engineering suits your interests and skills best. You'll have a genuine enthusiasm for anything “tech” and be able to really show this, both within and outside of your studies. You'll be able to show us your teamworking skills - everyone in Kainos works in tight-knit teams, so this is crucial. Our developers are creative - you'll be able to show us your skills for coming up with new ideas and ways of doing things, how you've solved problems and looked at things differently.",
+				responsibilities: [
+					"Contribute to developing high quality solutions which impact the lives of users worldwide.",
+					"You'll work as part of a team to solve problems and produce innovative software solutions.",
+					"Learn about new technologies and approaches, with talented colleagues who will help you learn, develop and grow.",
+					"Based in our Kainos office and often on our customer sites, you will work on project teams to learn how to develop and unit test straightforward or low complexity components, and then moving on to more complex elements as you increase your knowledge.",
+					"Work with other developers in working through designs and user stories and to produce real development solutions.",
+					"Will be fully supported by experienced colleagues in the team to follow designs, and then progress to assist in any other aspect of the project life-cycle under supervision.",
+					"Develop excellent technical, team-working and Agile project experience.",
+				],
+				sharepointUrl:
+					"https://kainossoftwareltd.sharepoint.com/sites/Career/JobProfiles/Engineering/Job%20profile%20-%20Apprentice%20Software%20Engineer%20(Apprentice).pdf",
+				numberOfOpenPositions: 8,
+			},
+			{
+				roleName: "Graduate Workday Data Consultant",
+				location: "London",
+				capabilityId: capabilityMap.Workday,
+				bandId: bandMap.Trainee,
+				closingDate: new Date("2026-12-15"),
+				statusId: statusMap.Open,
+				description:
+					"As a Workday Data Consultant (Trainee) in Kainos, you will be responsible for supporting the successful specification, design and configuration of enterprise-scale Workday product solutions. This will be done by working with internal delivery teams to provide solutions that are fit for purpose and commercially viable. Understanding and translating customer requirements, as well as hands-on product configuration is essential for this role.",
+				responsibilities: [
+					"Support the successful specification, design and configuration of enterprise-scale Workday product solutions.",
+					"Work with internal delivery teams to provide solutions that are fit for purpose and commercially viable.",
+					"Understand and translate customer requirements, as well as hands-on product configuration.",
+				],
+				sharepointUrl:
+					"https://kainossoftwareltd.sharepoint.com/sites/Career/JobProfiles/Workday/Data/Job%20profile%20-%20Workday%20Data%20Consultant%20(Trainee).pdf",
+				numberOfOpenPositions: 1,
+			},
+			{
+				roleName: "Graduate Test Engineer",
+				location: "Birmingham",
+				capabilityId: capabilityMap.Engineering,
+				bandId: bandMap.Trainee,
+				closingDate: new Date("2026-10-22"),
+				statusId: statusMap.Open,
+				description:
+					"As a Test Engineer (Trainee) in Kainos, you'll work within a multi-skilled agile team, developing and executing functional automated and manual tests to help the team deliver working application software that meets user needs. You'll do this whilst learning about new technologies and approaches, with talented colleagues who will help you learn, develop and grow.",
+				responsibilities: [
+					"Design test plans and test cases to ensure that the software meets the requirements and is of high quality.",
+					"Execute functional automated and manual tests to help the team deliver working application software that meets user needs.",
+					"Report defects and work with the team to resolve them.",
+				],
+				sharepointUrl:
+					"https://kainossoftwareltd.sharepoint.com/sites/Career/JobProfiles/Engineering/Job%20profile%20Trainee%20Test%20Engineer%20(Trainee).pdf",
+				numberOfOpenPositions: 3,
+			},
+			{
+				roleName: "Graduate Security Engineer",
+				location: "Dublin",
+				capabilityId: capabilityMap["Cyber Security"],
+				bandId: bandMap.Trainee,
+				closingDate: new Date("2026-12-20"),
+				statusId: statusMap.Open,
+				description:
+					"As a Trainee Security Engineer, you will work in close collaboration with our technology teams to design and implement secure, cloud-based software solutions for our clients. Working as part of a multi-disciplinary Agile team, you will implement DevSecOps practices throughout the software development lifecycle, embedding security practices (e.g. vulnerability management, threat modelling etc.) and automating security artifact generation (e.g. secret scanning, container security, SAST, DAST etc.). You will provide subject matter expertise in application security or cloud security – sharing knowledge on threats and vulnerabilities, identifying appropriate security controls, and increasing cyber security awareness within teams.",
+				responsibilities: [
+					"Daily collaboration with the application development and cloud platform teams to plan and prioritise security requirements as part of the secure software development lifecycle (SSDLC).",
+					"Implementation of automated security tooling (e.g. within a Continuous Integration (CI) pipeline) to validate security requirements and identify potential issues.",
+					"Reviewing the outputs from security tools and security practices. You will filter and prioritise these into security stories that can be understood and actioned by the delivery teams.",
+					"Verifying the implementation of security principles, architectural patterns, and requirements.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-04",
+				numberOfOpenPositions: 2,
+			},
+			{
+				roleName: "Associate Data Analyst",
+				location: "Belfast",
+				capabilityId: capabilityMap["Data & AI"],
+				bandId: bandMap.Associate,
+				closingDate: new Date("2026-12-22"),
+				statusId: statusMap.Open,
+				description:
+					"As a Data Analyst (Associate) in Kainos, you'll be responsible for matching the needs of data insight with understanding of the available data. Data analysts work closely with customers to produce insight products including reports, dashboards and visualisations but also contribute to project understanding of existing data structures so that inputs and outputs are fully understood. Most of our work comes through repeat business and direct referrals, which comes down to the quality of our people. The success of our Data Engineering teams means that customers are bringing us an increasing number of exciting data projects using cuttingedge technology to solve real-world problems. We are seeking more high calibre people to join our Data & Analytics capability where you will grow and contribute to industryleading technical expertise.",
+				responsibilities: [
+					"Work with customers to produce insight products including reports, dashboards and visualisations.",
+					"Contribute to project understanding of existing data structures so that inputs and outputs are fully understood.",
+					"Match the needs of data insight with understanding of the available data.",
+				],
+				sharepointUrl:
+					"https://kainossoftwareltd.sharepoint.com/sites/Career/JobProfiles/Data%20and%20Artificial%20Intelligence/Job%20profile%20-%20Data%20Analyst%20(As).pdf",
+				numberOfOpenPositions: 2,
+			},
+			{
+				roleName: "Pagination Seed Role 06 - Platform Reliability Engineer",
+				location: "Gdansk",
+				capabilityId: capabilityMap.Platforms,
+				bandId: bandMap.Consultant,
+				closingDate: new Date("2026-12-23"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Improve service reliability through observability and automation.",
+					"Respond to incidents and drive preventive improvements.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-06",
+				numberOfOpenPositions: 1,
+			},
+			{
+				roleName: "Pagination Seed Role 07 - UX Designer",
+				location: "London",
+				capabilityId: capabilityMap["Experience Design"],
+				bandId: bandMap["Senior Associate"],
+				closingDate: new Date("2026-12-24"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Create interface concepts and test with users.",
+					"Translate research insights into design decisions.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-07",
+				numberOfOpenPositions: 2,
+			},
+			{
+				roleName: "Pagination Seed Role 08 - Business Operations Coordinator",
+				location: "Birmingham",
+				capabilityId: capabilityMap.Operations,
+				bandId: bandMap.Associate,
+				closingDate: new Date("2026-12-26"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Coordinate operational tasks across multiple teams.",
+					"Maintain process documentation and status reporting.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-08",
+				numberOfOpenPositions: 3,
+			},
+			{
+				roleName: "Pagination Seed Role 09 - Commercial Analyst",
+				location: "Derry/Londonderry",
+				capabilityId: capabilityMap["Commercial & Financial Management"],
+				bandId: bandMap.Associate,
+				closingDate: new Date("2026-12-27"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Support forecasting, budgeting and cost analysis.",
+					"Prepare commercial reports for stakeholders.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-09",
+				numberOfOpenPositions: 1,
+			},
+			{
+				roleName: "Pagination Seed Role 10 - People Advisor",
+				location: "Belfast",
+				capabilityId: capabilityMap.People,
+				bandId: bandMap.Consultant,
+				closingDate: new Date("2026-12-28"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Advise managers on people policies and practices.",
+					"Support performance and development initiatives.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-10",
+				numberOfOpenPositions: 2,
+			},
+			{
+				roleName: "Pagination Seed Role 11 - Workday Functional Consultant",
+				location: "Dublin",
+				capabilityId: capabilityMap.Workday,
+				bandId: bandMap.Consultant,
+				closingDate: new Date("2026-12-29"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Configure and optimize Workday solutions for clients.",
+					"Gather requirements and document functional designs.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-11",
+				numberOfOpenPositions: 2,
+			},
+			{
+				roleName: "Pagination Seed Role 12 - Strategy Associate",
+				location: "London",
+				capabilityId: capabilityMap["Organisational Strategy & Planning"],
+				bandId: bandMap.Associate,
+				closingDate: new Date("2026-12-30"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Support strategic planning and initiative tracking.",
+					"Develop insights and recommendations for leadership.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-12",
+				numberOfOpenPositions: 1,
+			},
+			{
+				roleName: "Pagination Seed Role 13 - Marketing Executive",
+				location: "Birmingham",
+				capabilityId: capabilityMap["Business Development & Marketing"],
+				bandId: bandMap.Associate,
+				closingDate: new Date("2027-01-03"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Support campaign planning and execution.",
+					"Track engagement metrics and report outcomes.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-13",
+				numberOfOpenPositions: 2,
+			},
+			{
+				roleName: "Pagination Seed Role 14 - Support Services Coordinator",
+				location: "Gdansk",
+				capabilityId: capabilityMap["Business Services Support"],
+				bandId: bandMap["Senior Associate"],
+				closingDate: new Date("2027-01-04"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Coordinate shared services operations and escalations.",
+					"Improve process efficiency across support functions.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-14",
+				numberOfOpenPositions: 1,
+			},
+			{
+				roleName: "Pagination Seed Role 15 - Junior Test Engineer",
+				location: "Belfast",
+				capabilityId: capabilityMap.Engineering,
+				bandId: bandMap.Trainee,
+				closingDate: new Date("2027-01-05"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Execute test scenarios and report defects.",
+					"Collaborate with developers to verify fixes.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-15",
+				numberOfOpenPositions: 4,
+			},
+			{
+				roleName: "Pagination Seed Role 16 - Principal Platform Architect",
+				location: "London",
+				capabilityId: capabilityMap.Platforms,
+				bandId: bandMap.Principal,
+				closingDate: new Date("2027-01-06"),
+				statusId: statusMap.Closed,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Define platform architecture standards and roadmaps.",
+					"Mentor teams on reliability and scalability practices.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-16",
+				numberOfOpenPositions: 0,
+			},
+			{
+				roleName: "Pagination Seed Role 17 - AI Engineer",
+				location: "Dublin",
+				capabilityId: capabilityMap["Data & AI"],
+				bandId: bandMap.Consultant,
+				closingDate: new Date("2027-01-07"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Develop AI features aligned to product goals.",
+					"Evaluate model performance and data quality.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-17",
+				numberOfOpenPositions: 2,
+			},
+			{
+				roleName: "Pagination Seed Role 18 - Product Owner",
+				location: "Birmingham",
+				capabilityId: capabilityMap.Product,
+				bandId: bandMap.Manager,
+				closingDate: new Date("2027-01-08"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Own roadmap priorities and stakeholder alignment.",
+					"Guide backlog outcomes with delivery teams.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-18",
+				numberOfOpenPositions: 1,
+			},
+			{
+				roleName: "Pagination Seed Role 19 - Programme Manager",
+				location: "London",
+				capabilityId: capabilityMap.Delivery,
+				bandId: bandMap.Manager,
+				closingDate: new Date("2027-01-09"),
+				statusId: statusMap.Open,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Manage programme-level delivery plans and governance.",
+					"Coordinate teams to deliver outcomes on schedule.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-19",
+				numberOfOpenPositions: 1,
+			},
+			{
+				roleName: "Pagination Seed Role 20 - Senior People Partner",
+				location: "Belfast",
+				capabilityId: capabilityMap.People,
+				bandId: bandMap.Principal,
+				closingDate: new Date("2027-01-10"),
+				statusId: statusMap.Closed,
+				description:
+					"Seed role created to provide realistic volume for pagination and list view testing.",
+				responsibilities: [
+					"Lead strategic people initiatives across business units.",
+					"Coach leaders on workforce planning and development.",
+				],
+				sharepointUrl:
+					"https://example.com/job-profiles/pagination-seed-role-20",
+				numberOfOpenPositions: 0,
+			},
 		],
 		skipDuplicates: true,
 	});
