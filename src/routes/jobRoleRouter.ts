@@ -22,6 +22,13 @@ export const createJobRoleRouter = (
 		controller.getJobRoleById.bind(controller),
 	);
 
+	//The following routes are protected and require authentication
+	router.use(requireAuth(true));
+
+	router.post("/", controller.create.bind(controller));
+	router.put("/:id", controller.update.bind(controller));
+	router.delete("/:id", controller.delete.bind(controller));
+
 	return router;
 };
 

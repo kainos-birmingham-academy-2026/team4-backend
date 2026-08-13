@@ -50,4 +50,11 @@ export class JobRoleController {
 			res.status(500).json({ error: "Internal server error" });
 		}
 	}
+
+	// The following methods are placeholders for future implementation
+	async create() {}
+
+	async update() {}
+
+	async delete() {}
 }
