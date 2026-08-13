@@ -13,7 +13,7 @@ export const createJobRoleRouter = (
 		jobRoleService ?? new JobRoleService(),
 	);
 
-	router.use(requireAuth);
+	router.use(requireAuth(false));
 
 	router.get("/", controller.getAllJobRoles.bind(controller));
 	router.get(
@@ -21,6 +21,13 @@ export const createJobRoleRouter = (
 		validateParams(IdParamSchema),
 		controller.getJobRoleById.bind(controller),
 	);
+
+	//The following routes are protected and require authentication
+	router.use(requireAuth(true));
+
+	router.post("/", controller.create.bind(controller));
+	router.put("/:id", controller.update.bind(controller));
+	router.delete("/:id", controller.delete.bind(controller));
 
 	return router;
 };

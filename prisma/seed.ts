@@ -9,8 +9,6 @@ async function main() {
 	await prisma.capability.deleteMany();
 	await prisma.band.deleteMany();
 
-	const passwordHash = await argon2.hash("Password123!");
-
 	// Seed capabilities and bands arrays
 	const capabilities = [
 		"Engineering",
@@ -43,12 +41,25 @@ async function main() {
 
 	const statuses = ["Open", "Closed"];
 
+	const passwordHash = await argon2.hash("Password123!");
+	const adminPasswordHash = await argon2.hash("AdminPassword123!");
+
 	await prisma.user.upsert({
 		where: { email: "test1@example.com" },
 		update: {},
 		create: {
 			email: "test1@example.com",
 			passwordHash,
+		},
+	});
+
+	await prisma.user.upsert({
+		where: { email: "admin@example.com" },
+		update: {},
+		create: {
+			email: "admin@example.com",
+			passwordHash: adminPasswordHash,
+			role: "ADMIN",
 		},
 	});
 

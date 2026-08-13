@@ -20,7 +20,7 @@ describe("requireAuth", () => {
 		} as unknown as Response;
 		const next = vi.fn();
 
-		requireAuth(req, res, next);
+		requireAuth(false)(req, res, next);
 
 		expect(res.status).toHaveBeenCalledWith(401);
 		expect(res.json).toHaveBeenCalledWith({ message: "Invalid token" });
@@ -43,7 +43,7 @@ describe("requireAuth", () => {
 		} as unknown as Response;
 		const next = vi.fn();
 
-		requireAuth(req, res, next);
+		requireAuth(false)(req, res, next);
 
 		expect(next).toHaveBeenCalledOnce();
 		expect(res.locals.authUser).toEqual({
