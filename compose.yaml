@@ -29,6 +29,7 @@ services:
     environment:
       - PORT=4000
       - DATABASE_URL=postgresql://postgres:password@job-db:5432/jobRoles
+      - JWT_SECRET=${JWT_SECRET:-dev-jwt-secret}
       - PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
     depends_on:
       job-db:
