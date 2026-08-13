@@ -3,35 +3,70 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createJobRoleRouter } from "../../src/routes/jobRoleRouter";
 import { JobRoleService } from "../../src/services/jobRoleService";
-import { mockJobRoleResponse1, mockJobRoleResponses } from "../mockJobRoles";
+import { mockJobRoleResponses, mockJobRoles } from "../mockJobRoles";
 
 vi.mock("../../src/services/jobRoleService");
 vi.mock("../../src/middlewares/requireAuth", () => ({
 	requireAuth: vi.fn((_req, _res, next) => next()),
 }));
 
-const mockFindAllJobRoles = vi.fn().mockResolvedValue(mockJobRoleResponses);
 const mockService = new (vi.mocked(JobRoleService))();
 
 const testApp = express();
 testApp.use(express.json());
 testApp.use(express.urlencoded({ extended: true }));
-testApp.use("/api/job-roles", createJobRoleRouter(mockService));
+testApp.use(
+	"/api/job-roles",
+	createJobRoleRouter(mockService as unknown as JobRoleService),
+);
 
 describe("GET /api/job-roles", async () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
-	it("should return all open job roles with status 200", async () => {
-		mockService.findAllJobRoles = mockFindAllJobRoles;
+	it("should return paginated job roles with status 200", async () => {
+		mockService.findPaginatedJobRoles = vi.fn().mockResolvedValue({
+			jobs: mockJobRoles,
+			totalCount: 25,
+		});
 
-		const response = await request(testApp).get("/api/job-roles/");
+		const response = await request(testApp).get("/api/job-roles");
 
 		expect(response.status).toBe(200);
-		expect(response.body).toEqual(
-			JSON.parse(JSON.stringify(mockJobRoleResponses)),
-		);
+		expect(response.body).toEqual({
+			jobs: JSON.parse(JSON.stringify(mockJobRoles)),
+			pagination: {
+				currentPage: 1,
+				totalPages: 3,
+				totalCount: 25,
+				pageSize: 10,
+				hasNext: true,
+				hasPrev: false,
+			},
+		});
+	});
+
+	it("should return paginated results for page 2", async () => {
+		mockService.findPaginatedJobRoles = vi.fn().mockResolvedValue({
+			jobs: [mockJobRoles[0]],
+			totalCount: 25,
+		});
+
+		const response = await request(testApp).get("/api/job-roles?page=2");
+
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({
+			jobs: JSON.parse(JSON.stringify([mockJobRoles[0]])),
+			pagination: {
+				currentPage: 2,
+				totalPages: 3,
+				totalCount: 25,
+				pageSize: 10,
+				hasNext: true,
+				hasPrev: true,
+			},
+		});
 	});
 });
 
@@ -43,13 +78,13 @@ describe("GET /api/job-roles/:id", async () => {
 	it("should return the job role with status 200 when found", async () => {
 		mockService.findJobRoleById = vi
 			.fn()
-			.mockResolvedValue(mockJobRoleResponse1);
+			.mockResolvedValue(mockJobRoleResponses[0]);
 
 		const response = await request(testApp).get(`/api/job-roles/1`);
 
 		expect(response.status).toBe(200);
 		expect(response.body).toEqual(
-			JSON.parse(JSON.stringify(mockJobRoleResponse1)),
+			JSON.parse(JSON.stringify(mockJobRoleResponses[0])),
 		);
 	});
 

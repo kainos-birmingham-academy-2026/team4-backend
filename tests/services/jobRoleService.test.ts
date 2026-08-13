@@ -90,3 +90,54 @@ describe("JobRoleService - findJobRoleById", () => {
 		expect(mapJobRoleToDetailedResponseMock).not.toHaveBeenCalled();
 	});
 });
+
+describe("JobRoleService - findPaginatedJobRoles", () => {
+	let jobRoleService: JobRoleService;
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+		mapJobRoleToResponseMock.mockReset();
+		jobRoleService = new JobRoleService();
+	});
+
+	it("should return paginated job roles with total count", async () => {
+		vi.mocked(prisma).jobRole.findMany = vi
+			.fn()
+			.mockResolvedValue([mockJobRoles[0]]);
+		vi.mocked(prisma).jobRole.count = vi.fn().mockResolvedValue(25);
+		mapJobRoleToResponseMock.mockResolvedValue(mockJobRoleResponses[0]);
+
+		const result = await jobRoleService.findPaginatedJobRoles(0, 10);
+
+		expect(result).toEqual({
+			jobs: [mockJobRoleResponses[0]],
+			totalCount: 25,
+		});
+		expect(vi.mocked(prisma).jobRole.findMany).toHaveBeenCalledWith({
+			skip: 0,
+			take: 10,
+			orderBy: { jobRoleId: "asc" },
+		});
+		expect(mapJobRoleToResponseMock).toHaveBeenCalledTimes(1);
+	});
+
+	it("should return paginated results for page 2", async () => {
+		vi.mocked(prisma).jobRole.findMany = vi
+			.fn()
+			.mockResolvedValue([mockJobRoles[1]]);
+		vi.mocked(prisma).jobRole.count = vi.fn().mockResolvedValue(25);
+		mapJobRoleToResponseMock.mockResolvedValue(mockJobRoleResponses[1]);
+
+		const result = await jobRoleService.findPaginatedJobRoles(10, 10);
+
+		expect(result).toEqual({
+			jobs: [mockJobRoleResponses[1]],
+			totalCount: 25,
+		});
+		expect(vi.mocked(prisma).jobRole.findMany).toHaveBeenCalledWith({
+			skip: 10,
+			take: 10,
+			orderBy: { jobRoleId: "asc" },
+		});
+	});
+});

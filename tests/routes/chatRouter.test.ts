@@ -57,7 +57,7 @@ describe("POST /api/chat", () => {
 			.send({ message: "" });
 
 		expect(response.status).toBe(400);
-		expect(response.body[0]?.field).toBe("message");
+		expect(response.body.errors?.[0]?.field).toBe("message");
 		expect(mockChatService.getChatResponse).not.toHaveBeenCalled();
 	});
 });
