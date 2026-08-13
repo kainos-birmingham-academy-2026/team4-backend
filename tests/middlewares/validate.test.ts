@@ -11,16 +11,6 @@ beforeAll(() => {
 	vi.clearAllMocks();
 });
 
-const mockRequest = {
-	body: {},
-	params: {},
-} as unknown as Request;
-
-const mockResponse = {
-	status: vi.fn().mockReturnThis(),
-	json: vi.fn(),
-} as unknown as Response;
-
 describe("validate.ts - formatZodError", () => {
 	it("formats zod errors into field/message objects", () => {
 		const schema = z.object({ id: z.coerce.number().int().positive() });

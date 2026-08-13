@@ -2,7 +2,6 @@ import express from "express";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createAuthRouter } from "../../src/routes/authRouter";
-import type { AuthService } from "../../src/services/authService";
 import { AuthError } from "../../src/services/authService";
 
 const mockLogin = vi.fn();
