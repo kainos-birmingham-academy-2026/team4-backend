@@ -37,9 +37,13 @@ export class AuthService {
 			throw new Error("JWT_SECRET has not been configured");
 		}
 
-		return jwt.sign({ userId: user.id, email: user.email }, secret, {
-			expiresIn: "1h",
-		});
+		return jwt.sign(
+			{ userId: user.id, email: user.email, role: user.role },
+			secret,
+			{
+				expiresIn: "1h",
+			},
+		);
 	}
 
 	public async login(input: AuthRequestDto): Promise<string> {
@@ -66,8 +70,12 @@ export class AuthService {
 			throw new Error("JWT_SECRET has not been configured");
 		}
 
-		return jwt.sign({ userId: user.id, email: user.email }, secret, {
-			expiresIn: "1h",
-		});
+		return jwt.sign(
+			{ userId: user.id, email: user.email, role: user.role },
+			secret,
+			{
+				expiresIn: "1h",
+			},
+		);
 	}
 }

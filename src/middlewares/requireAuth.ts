@@ -6,6 +6,7 @@ const TOKEN_ERROR = "Invalid token";
 interface AuthTokenPayload {
 	userId: number;
 	email: string;
+	role: string;
 }
 
 export const requireAuth: RequestHandler = (req, res, next) => {
@@ -54,6 +55,7 @@ export const requireAuth: RequestHandler = (req, res, next) => {
 		res.locals.authUser = {
 			userId: payload.userId,
 			email: payload.email,
+			role: payload.role,
 		};
 
 		// Continue request pipeline.
