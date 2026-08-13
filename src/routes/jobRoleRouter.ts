@@ -13,7 +13,7 @@ export const createJobRoleRouter = (
 		jobRoleService ?? new JobRoleService(),
 	);
 
-	router.use(requireAuth);
+	router.use(requireAuth(false));
 
 	router.get("/", controller.getAllJobRoles.bind(controller));
 	router.get(
