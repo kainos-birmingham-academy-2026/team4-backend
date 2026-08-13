@@ -3,7 +3,11 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createJobRoleRouter } from "../../src/routes/jobRoleRouter";
 import { JobRoleService } from "../../src/services/jobRoleService";
-import { mockJobRoleResponse1, mockJobRoleResponses } from "../mockJobRoles";
+import {
+	mockJobRoleResponse1,
+	mockJobRoleResponses,
+	mockJobRoles,
+} from "../mockJobRoles";
 
 vi.mock("../../src/services/jobRoleService");
 vi.mock("../../src/middlewares/requireAuth", () => ({
@@ -35,7 +39,7 @@ describe("GET /api/job-roles", async () => {
 
 		expect(response.status).toBe(200);
 		expect(response.body).toEqual({
-			jobs: mockJobRoles,
+			jobs: JSON.parse(JSON.stringify(mockJobRoles)),
 			pagination: {
 				currentPage: 1,
 				totalPages: 3,
@@ -57,7 +61,7 @@ describe("GET /api/job-roles", async () => {
 
 		expect(response.status).toBe(200);
 		expect(response.body).toEqual({
-			jobs: [mockJobRoles[0]],
+			jobs: JSON.parse(JSON.stringify([mockJobRoles[0]])),
 			pagination: {
 				currentPage: 2,
 				totalPages: 3,
