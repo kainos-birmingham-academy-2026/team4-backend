@@ -34,3 +34,17 @@ export function validateBody(schema: z.ZodSchema): RequestHandler {
 		next();
 	};
 }
+
+export function validateQuery(schema: z.ZodSchema): RequestHandler {
+	return (req, res, next) => {
+		const result = schema.safeParse(req.query);
+
+		if (!result.success) {
+			res.status(400).json(formatZodError(result.error));
+			return;
+		}
+
+		res.locals.validatedQuery = result.data;
+		next();
+	};
+}
