@@ -9,59 +9,65 @@ interface AuthTokenPayload {
 	role: string;
 }
 
-export const requireAuth: RequestHandler = (req, res, next) => {
-	// Read the Authorization header in the form: Bearer <token>
-	const authHeader = req.header("authorization");
+export const requireAuth = (requireAdmin: boolean = false): RequestHandler => {
+	return (req, res, next) => {
+		// Read the Authorization header in the form: Bearer <token>
+		const authHeader = req.header("authorization");
 
-	// Return a generic 401 so we do not leak token parsing details.
-	if (!authHeader?.startsWith("Bearer ")) {
-		return res.status(401).json({ message: TOKEN_ERROR });
-	}
-
-	// Strip the Bearer prefix and validate token presence.
-	const token = authHeader.slice("Bearer ".length).trim();
-
-	if (!token) {
-		return res.status(401).json({ message: TOKEN_ERROR });
-	}
-
-	// JWT secret must exist at runtime; this is a server config problem.
-	const secret = process.env.JWT_SECRET;
-
-	if (!secret) {
-		return res.status(500).json({ error: "Internal server error" });
-	}
-
-	try {
-		// Verify signature and expiration.
-		const decoded = jwt.verify(token, secret);
-
-		// We only accept object payloads, not string payloads.
-		if (typeof decoded === "string") {
+		// Return a generic 401 so we do not leak token parsing details.
+		if (!authHeader?.startsWith("Bearer ")) {
 			return res.status(401).json({ message: TOKEN_ERROR });
 		}
 
-		const payload = decoded as Partial<AuthTokenPayload>;
+		// Strip the Bearer prefix and validate token presence.
+		const token = authHeader.slice("Bearer ".length).trim();
 
-		// Enforce required claim types before trusting payload values.
-		if (
-			typeof payload.userId !== "number" ||
-			typeof payload.email !== "string"
-		) {
+		if (!token) {
 			return res.status(401).json({ message: TOKEN_ERROR });
 		}
 
-		// Expose authenticated user context to downstream handlers.
-		res.locals.authUser = {
-			userId: payload.userId,
-			email: payload.email,
-			role: payload.role,
-		};
+		// JWT secret must exist at runtime; this is a server config problem.
+		const secret = process.env.JWT_SECRET;
 
-		// Continue request pipeline.
-		next();
-	} catch {
-		// Includes invalid signature, malformed token, and expired token.
-		return res.status(401).json({ message: TOKEN_ERROR });
-	}
+		if (!secret) {
+			return res.status(500).json({ error: "Internal server error" });
+		}
+
+		try {
+			// Verify signature and expiration.
+			const decoded = jwt.verify(token, secret);
+
+			// We only accept object payloads, not string payloads.
+			if (typeof decoded === "string") {
+				return res.status(401).json({ message: TOKEN_ERROR });
+			}
+
+			const payload = decoded as Partial<AuthTokenPayload>;
+
+			// Enforce required claim types before trusting payload values.
+			if (
+				typeof payload.userId !== "number" ||
+				typeof payload.email !== "string"
+			) {
+				return res.status(401).json({ message: TOKEN_ERROR });
+			}
+
+			if (requireAdmin && payload.role !== "ADMIN") {
+				return res.status(403).json({ message: "Forbidden" });
+			}
+
+			// Expose authenticated user context to downstream handlers.
+			res.locals.authUser = {
+				userId: payload.userId,
+				email: payload.email,
+				role: payload.role,
+			};
+
+			// Continue request pipeline.
+			next();
+		} catch {
+			// Includes invalid signature, malformed token, and expired token.
+			return res.status(401).json({ message: TOKEN_ERROR });
+		}
+	};
 };
