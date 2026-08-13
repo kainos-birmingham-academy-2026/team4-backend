@@ -3,11 +3,7 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createJobRoleRouter } from "../../src/routes/jobRoleRouter";
 import { JobRoleService } from "../../src/services/jobRoleService";
-import {
-	mockJobRoleResponse1,
-	mockJobRoleResponses,
-	mockJobRoles,
-} from "../mockJobRoles";
+import { mockJobRoleResponses, mockJobRoles } from "../mockJobRoles";
 
 vi.mock("../../src/services/jobRoleService");
 vi.mock("../../src/middlewares/requireAuth", () => ({
@@ -82,13 +78,13 @@ describe("GET /api/job-roles/:id", async () => {
 	it("should return the job role with status 200 when found", async () => {
 		mockService.findJobRoleById = vi
 			.fn()
-			.mockResolvedValue(mockJobRoleResponse1);
+			.mockResolvedValue(mockJobRoleResponses[0]);
 
 		const response = await request(testApp).get(`/api/job-roles/1`);
 
 		expect(response.status).toBe(200);
 		expect(response.body).toEqual(
-			JSON.parse(JSON.stringify(mockJobRoleResponse1)),
+			JSON.parse(JSON.stringify(mockJobRoleResponses[0])),
 		);
 	});
 
