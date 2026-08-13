@@ -2,10 +2,12 @@ import type { RequestHandler } from "express";
 import type { ZodSchema, z } from "zod";
 
 export function formatZodError(error: z.ZodError) {
-	return error.issues.map((issue) => ({
-		field: issue.path.join("."),
-		message: issue.message,
-	}));
+	return {
+		errors: error.issues.map((issue) => ({
+			field: issue.path.join("."),
+			message: issue.message,
+		})),
+	};
 }
 
 export function validateParams(schema: ZodSchema): RequestHandler {

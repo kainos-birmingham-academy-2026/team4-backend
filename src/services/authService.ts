@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import type { AuthRequestDto } from "../dtos/authDto.js";
 import prisma from "../prismaClient.js";
 
-const LOGIN_ERROR = "Invalid email or password";
+const AUTH_ERROR = "Invalid email or password";
 
 export class AuthError extends Error {
 	public constructor(
@@ -48,7 +48,7 @@ export class AuthService {
 		});
 
 		if (!user) {
-			throw new AuthError(401, LOGIN_ERROR);
+			throw new AuthError(401, AUTH_ERROR);
 		}
 
 		const validPassword = await argon2.verify(
@@ -57,7 +57,7 @@ export class AuthService {
 		);
 
 		if (!validPassword) {
-			throw new AuthError(401, LOGIN_ERROR);
+			throw new AuthError(401, AUTH_ERROR);
 		}
 
 		const secret = process.env.JWT_SECRET;
