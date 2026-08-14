@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import type { JobRoleResponse } from "../dtos/jobRoleDto.js";
+import type { JobRoleQuery } from "../dtos/jobRoleDto.js";
 import { JobRoleService } from "../services/jobRoleService.js";
 
 export class JobRoleController {
@@ -9,13 +9,14 @@ export class JobRoleController {
 
 	async getAllJobRoles(req: Request, res: Response): Promise<void> {
 		try {
-			const pageParam = req.query.page as string | undefined;
-			const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
+			const { page, ...filters } = (res.locals.validatedQuery ?? {
+				page: 1,
+			}) as JobRoleQuery;
 			const limit = 10;
 			const skip = (page - 1) * limit;
 
 			const { jobs, totalCount } =
-				await this.jobRoleService.findPaginatedJobRoles(skip, limit);
+				await this.jobRoleService.findPaginatedJobRoles(skip, limit, filters);
 			const totalPages = Math.ceil(totalCount / limit);
 			const hasNext = page < totalPages;
 			const hasPrev = page > 1;
@@ -31,6 +32,15 @@ export class JobRoleController {
 					hasPrev,
 				},
 			});
+		} catch (_error) {
+			res.status(500).json({ error: "Internal server error" });
+		}
+	}
+
+	async getFilterOptions(req: Request, res: Response): Promise<void> {
+		try {
+			const options = await this.jobRoleService.findFilterOptions();
+			res.status(200).json(options);
 		} catch (_error) {
 			res.status(500).json({ error: "Internal server error" });
 		}

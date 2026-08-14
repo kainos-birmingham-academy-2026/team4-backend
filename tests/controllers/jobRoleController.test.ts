@@ -13,6 +13,7 @@ const mockRequest = {
 const mockResponse = {
 	status: vi.fn().mockReturnThis(),
 	json: vi.fn(),
+	locals: {} as Record<string, unknown>,
 } as unknown as Response;
 
 const mockJobRoleService = {
@@ -27,6 +28,7 @@ describe("JobRoleController - getAllJobRoles", async () => {
 	beforeEach(() => {
 		jobRoleController = new JobRoleController(mockJobRoleService);
 		vi.clearAllMocks();
+		mockResponse.locals.validatedQuery = { page: 1 };
 	});
 
 	it("should return paginated job roles with default page 1 and status 200", async () => {
@@ -43,6 +45,7 @@ describe("JobRoleController - getAllJobRoles", async () => {
 		expect(mockJobRoleService.findPaginatedJobRoles).toHaveBeenCalledWith(
 			0,
 			10,
+			{},
 		);
 		expect(mockResponse.status).toHaveBeenCalledWith(200);
 		expect(mockResponse.json).toHaveBeenCalledWith({
@@ -59,7 +62,7 @@ describe("JobRoleController - getAllJobRoles", async () => {
 	});
 
 	it("should return paginated job roles for a specific page", async () => {
-		const mockRequest2 = { ...mockRequest, query: { page: "2" } };
+		mockResponse.locals.validatedQuery = { page: 2 };
 		const mockPaginatedResponse = {
 			jobs: [mockJobRoles[0]],
 			totalCount: 25,
@@ -68,11 +71,12 @@ describe("JobRoleController - getAllJobRoles", async () => {
 			.fn()
 			.mockResolvedValue(mockPaginatedResponse);
 
-		await jobRoleController.getAllJobRoles(mockRequest2, mockResponse);
+		await jobRoleController.getAllJobRoles(mockRequest, mockResponse);
 
 		expect(mockJobRoleService.findPaginatedJobRoles).toHaveBeenCalledWith(
 			10,
 			10,
+			{},
 		);
 		expect(mockResponse.status).toHaveBeenCalledWith(200);
 		expect(mockResponse.json).toHaveBeenCalledWith({
@@ -98,6 +102,43 @@ describe("JobRoleController - getAllJobRoles", async () => {
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
 			error: "Internal server error",
+		});
+	});
+
+	it("should forward the validated filters to the service", async () => {
+		mockResponse.locals.validatedQuery = {
+			page: 1,
+			roleName: "engineer",
+			capability: ["Engineering", "Data"],
+			status: ["Open"],
+		};
+		mockJobRoleService.findPaginatedJobRoles = vi.fn().mockResolvedValue({
+			jobs: [],
+			totalCount: 0,
+		});
+
+		await jobRoleController.getAllJobRoles(mockRequest, mockResponse);
+
+		expect(mockJobRoleService.findPaginatedJobRoles).toHaveBeenCalledWith(
+			0,
+			10,
+			{
+				roleName: "engineer",
+				capability: ["Engineering", "Data"],
+				status: ["Open"],
+			},
+		);
+		expect(mockResponse.status).toHaveBeenCalledWith(200);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			jobs: [],
+			pagination: {
+				currentPage: 1,
+				totalPages: 0,
+				totalCount: 0,
+				pageSize: 10,
+				hasNext: false,
+				hasPrev: false,
+			},
 		});
 	});
 });

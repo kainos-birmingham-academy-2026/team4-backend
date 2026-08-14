@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { JobRoleController } from "../controllers/jobRoleController.js";
-import { IdParamSchema } from "../dtos/jobRoleDto.js";
+import { IdParamSchema, JobRoleFilterSchema } from "../dtos/jobRoleDto.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
-import { validateParams } from "../middlewares/validate.js";
+import { validateParams, validateQuery } from "../middlewares/validate.js";
 import { JobRoleService } from "../services/jobRoleService.js";
 
 export const createJobRoleRouter = (
@@ -15,7 +15,12 @@ export const createJobRoleRouter = (
 
 	router.use(requireAuth(false));
 
-	router.get("/", controller.getAllJobRoles.bind(controller));
+	router.get(
+		"/",
+		validateQuery(JobRoleFilterSchema),
+		controller.getAllJobRoles.bind(controller),
+	);
+	router.get("/filter-options", controller.getFilterOptions.bind(controller));
 	router.get(
 		"/:id",
 		validateParams(IdParamSchema),
