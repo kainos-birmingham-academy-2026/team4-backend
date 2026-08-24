@@ -1,28 +1,51 @@
-FROM node:24-slim
+FROM node:24-slim AS deps
 
-# Prisma on slim may require OpenSSL. Keep certs updated for engine downloads.
 RUN apt-get update -y \
-	&& apt-get install -y openssl ca-certificates \
+	&& apt-get install -y --no-install-recommends openssl ca-certificates \
 	&& update-ca-certificates \
 	&& rm -rf /var/lib/apt/lists/*
 
 WORKDIR /team4-backend
 
-# Some environments cannot fetch checksum files for Prisma engines; this keeps
-# builds/startup resilient for local reviewer setups.
-ENV PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
-
-# Copy package files first for better layer caching.
 COPY package*.json ./
-
-# Skip repository hook scripts in container builds.
 RUN npm ci --ignore-scripts
 
-# Copy source.
-COPY . .
+FROM deps AS build
 
-RUN chmod +x /team4-backend/entrypoint.sh
+COPY prisma ./prisma
+COPY prisma.config.ts tsconfig.json ./
+COPY src ./src
+RUN NODE_TLS_REJECT_UNAUTHORIZED=0 \
+	DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres" \
+	PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 \
+	npx prisma generate \
+	&& npm run build
+
+FROM build AS production-deps
+
+RUN npm prune --omit=dev
+
+FROM node:24-slim AS runtime
+
+RUN apt-get update -y \
+	&& apt-get install -y --no-install-recommends openssl ca-certificates \
+	&& update-ca-certificates \
+	&& rm -rf /var/lib/apt/lists/*
+
+ENV NODE_ENV=production \
+	PORT=4000
+
+WORKDIR /team4-backend
+
+COPY --from=production-deps --chown=node:node /team4-backend/node_modules ./node_modules
+COPY --from=build --chown=node:node /team4-backend/dist ./dist
+COPY --from=build --chown=node:node /team4-backend/prisma/schema.prisma ./prisma/schema.prisma
+COPY --chown=node:node entrypoint.sh ./entrypoint.sh
+
+RUN chmod +x ./entrypoint.sh
+
+USER node
 
 EXPOSE 4000
 
-ENTRYPOINT ["/team4-backend/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
