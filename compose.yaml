@@ -33,6 +33,21 @@ services:
     networks:
       - team4-network
 
+  team4-backend-seed:
+    image: backend-seed:latest
+    build:
+      context: .
+      dockerfile: .dockerfile
+      target: build
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@job-db:5432/jobRoles
+    command: npx prisma db seed
+    depends_on:
+      team4-backend-migrate:
+        condition: service_completed_successfully
+    networks:
+      - team4-network
+
   team4-backend:
     image: backend:latest
     build:
@@ -46,7 +61,7 @@ services:
       - DATABASE_URL=postgresql://postgres:password@job-db:5432/jobRoles
       - JWT_SECRET=${JWT_SECRET:-dev-jwt-secret}
     depends_on:
-      team4-backend-migrate:
+      team4-backend-seed:
         condition: service_completed_successfully
     networks:
       - team4-network
