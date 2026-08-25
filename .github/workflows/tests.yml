@@ -1,0 +1,25 @@
+name: Tests
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test and quality checks
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:password@localhost:5432/jobRoles
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:coverage
