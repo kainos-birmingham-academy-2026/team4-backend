@@ -30,4 +30,4 @@ resource "azurerm_storage_container" "state" {
   container_access_type = "private"
 }
 
-# small comment
+# small comment again
