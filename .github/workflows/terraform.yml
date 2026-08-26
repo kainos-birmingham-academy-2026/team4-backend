@@ -21,9 +21,10 @@ env:
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+
 jobs:
   terraform:
-    name: Terraform ${{ github.ref == 'refs/heads/main' && 'apply' || 'plan' }}
+    name: Terraform plan
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -51,12 +52,5 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      # Non-main branches and PRs: plan only, never apply.
       - name: Terraform Plan
-        if: github.ref != 'refs/heads/main'
         run: terraform plan -input=false -var="environment=dev" -out=tfplan
-
-      # main branch: fully non-interactive apply, no manual approval prompt.
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -input=false -auto-approve -var="environment=dev"
