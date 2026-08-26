@@ -22,8 +22,3 @@ variable "tenant_id" {
   description = "Azure AD tenant that owns access to the Key Vault."
   type        = string
 }
-
-variable "admin_object_id" {
-  description = "Object ID of the identity that can manage secrets now."
-  type        = string
-}
