@@ -43,3 +43,51 @@ variable "container_app_environment_name" {
   type        = string
   default     = "cae-team4-backend-dev"
 }
+
+variable "container_app_name" {
+  description = "Name of the backend Container App."
+  type        = string
+  default     = "ca-team4-backend-dev"
+}
+
+variable "acr_name" {
+  description = "Existing Azure Container Registry the app will pull images from."
+  type        = string
+  default     = "acraiacademy26"
+}
+
+variable "acr_resource_group_name" {
+  description = "Resource group that already contains the shared ACR."
+  type        = string
+  default     = "rg-ai-academy-26"
+}
+
+variable "backend_image_name" {
+  description = "Repository name of the backend image in ACR."
+  type        = string
+  default     = "team4-backend"
+}
+
+variable "backend_image_tag" {
+  description = "Image tag to deploy. CD pushes latest before apply."
+  type        = string
+  default     = "latest"
+}
+
+variable "database_url_secret_name" {
+  description = "Key Vault secret name for DATABASE_URL."
+  type        = string
+  default     = "database-url"
+}
+
+variable "jwt_secret_name" {
+  description = "Key Vault secret name for JWT_SECRET."
+  type        = string
+  default     = "jwt-secret"
+}
+
+variable "feature_flags_enabled" {
+  description = "Feature flag toggle passed into the Container App as FEATURE_FLAGS_ENABLED."
+  type        = bool
+  default     = false
+}
