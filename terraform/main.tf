@@ -46,6 +46,26 @@ module "key_vault" {
   tenant_id           = data.azurerm_client_config.current.tenant_id
 }
 
+# Identity the Container App will use later to read Key Vault secrets and pull from ACR.
+module "managed_identity" {
+  source = "./modules/managed-identity"
+
+  name                = var.managed_identity_name
+  resource_group_name = module.resource_group.name
+  location            = module.resource_group.location
+  environment         = var.environment
+}
+
+# Shared platform for Container Apps. The app itself comes later.
+module "container_app_environment" {
+  source = "./modules/container-app-environment"
+
+  name                = var.container_app_environment_name
+  resource_group_name = module.resource_group.name
+  location            = module.resource_group.location
+  environment         = var.environment
+}
+
 moved {
   from = azurerm_resource_group.academy
   to   = module.resource_group.azurerm_resource_group.this
