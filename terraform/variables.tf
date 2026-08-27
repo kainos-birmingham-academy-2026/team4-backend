@@ -31,3 +31,15 @@ variable "key_vault_name" {
     error_message = "Key Vault name must be 3-24 characters, start with a letter, and contain only letters, numbers, or hyphens."
   }
 }
+
+variable "managed_identity_name" {
+  description = "Name of the user-assigned managed identity used by the Container App."
+  type        = string
+  default     = "id-team4-backend-dev"
+}
+
+variable "container_app_environment_name" {
+  description = "Name of the Container Apps environment."
+  type        = string
+  default     = "cae-team4-backend-dev"
+}
