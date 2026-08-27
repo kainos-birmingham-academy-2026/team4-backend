@@ -62,3 +62,13 @@ output "container_app_environment_default_domain" {
   description = "Default domain for apps hosted in this environment."
   value       = module.container_app_environment.default_domain
 }
+
+output "backend_container_app_name" {
+  description = "Name of the backend Container App."
+  value       = module.backend_container_app.name
+}
+
+output "backend_container_app_fqdn" {
+  description = "Internal FQDN of the backend Container App."
+  value       = module.backend_container_app.fqdn
+}

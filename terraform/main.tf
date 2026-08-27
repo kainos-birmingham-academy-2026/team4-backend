@@ -66,6 +66,26 @@ module "container_app_environment" {
   environment         = var.environment
 }
 
+data "azurerm_container_registry" "shared" {
+  name                = var.acr_name
+  resource_group_name = var.acr_resource_group_name
+}
+
+module "backend_container_app" {
+  source = "./modules/container-app"
+
+  name                         = var.container_app_name
+  resource_group_name          = module.resource_group.name
+  container_app_environment_id = module.container_app_environment.id
+  managed_identity_id          = module.managed_identity.id
+  registry_server              = data.azurerm_container_registry.shared.login_server
+  image                        = "${data.azurerm_container_registry.shared.login_server}/${var.backend_image_name}:${var.backend_image_tag}"
+  database_url_secret_id       = "${module.key_vault.uri}secrets/${var.database_url_secret_name}"
+  jwt_secret_id                = "${module.key_vault.uri}secrets/${var.jwt_secret_name}"
+  feature_flags_enabled        = var.feature_flags_enabled
+  environment                  = var.environment
+}
+
 moved {
   from = azurerm_resource_group.academy
   to   = module.resource_group.azurerm_resource_group.this
