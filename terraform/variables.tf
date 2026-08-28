@@ -10,6 +10,24 @@ variable "location" {
   default     = "UK South"
 }
 
+variable "network_resource_group_name" {
+  description = "Resource group containing the shared frontend and backend network."
+  type        = string
+  default     = "team4-shared-network-dev"
+}
+
+variable "network_name" {
+  description = "Name of the shared virtual network."
+  type        = string
+  default     = "vnet-team4-dev"
+}
+
+variable "backend_subnet_name" {
+  description = "Delegated subnet for the backend Container Apps Environment."
+  type        = string
+  default     = "snet-backend-aca-dev"
+}
+
 variable "environment" {
   description = "Deployment environment."
   type        = string
