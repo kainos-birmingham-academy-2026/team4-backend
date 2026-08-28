@@ -28,6 +28,12 @@ provider "azurerm" {
 # Who is running Terraform (your user locally, later the GitHub Actions OIDC identity).
 data "azurerm_client_config" "current" {}
 
+data "azurerm_subnet" "backend_container_apps" {
+  name                 = var.backend_subnet_name
+  virtual_network_name = var.network_name
+  resource_group_name  = var.network_resource_group_name
+}
+
 module "resource_group" {
   source = "./modules/resource-group"
 
@@ -60,10 +66,11 @@ module "managed_identity" {
 module "container_app_environment" {
   source = "./modules/container-app-environment"
 
-  name                = var.container_app_environment_name
-  resource_group_name = module.resource_group.name
-  location            = module.resource_group.location
-  environment         = var.environment
+  name                     = var.container_app_environment_name
+  resource_group_name      = module.resource_group.name
+  location                 = module.resource_group.location
+  infrastructure_subnet_id = data.azurerm_subnet.backend_container_apps.id
+  environment              = var.environment
 }
 
 data "azurerm_container_registry" "shared" {
