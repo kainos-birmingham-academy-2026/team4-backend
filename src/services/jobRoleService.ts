@@ -2,6 +2,7 @@ import type { JobRole, Prisma } from "@prisma/client";
 import type {
 	JobRoleDetailedResponse,
 	JobRoleFilters,
+	JobRoleOrdering,
 	JobRoleResponse,
 } from "../dtos/jobRoleDto.js";
 import { JobRoleMapper } from "../mappers/jobRoleMapper.js";
@@ -35,6 +36,29 @@ export class JobRoleService {
 		return where;
 	}
 
+	private buildOrderBy(
+		ordering: JobRoleOrdering,
+	): Prisma.JobRoleOrderByWithRelationInput {
+		const direction = ordering.sortOrder ?? "asc";
+
+		switch (ordering.sortBy) {
+			case "roleName":
+			case "location":
+			case "closingDate":
+				return { [ordering.sortBy]: direction };
+			case "capability":
+				return { capability: { capabilityName: direction } };
+			case "band":
+				return { band: { bandName: direction } };
+			case "status":
+				return { status: { statusName: direction } };
+			case "jobRoleId":
+				return { jobRoleId: direction };
+			default:
+				return { jobRoleId: "asc" };
+		}
+	}
+
 	async findAllJobRoles(): Promise<JobRoleResponse[]> {
 		const jobRoles: JobRole[] = await prisma.jobRole.findMany();
 		const jobRoleResponses = await Promise.all(
@@ -59,14 +83,16 @@ export class JobRoleService {
 		skip: number,
 		take: number,
 		filters: JobRoleFilters = {},
+		ordering: JobRoleOrdering = {},
 	): Promise<{ jobs: JobRoleResponse[]; totalCount: number }> {
 		const where = this.buildWhere(filters);
+		const orderBy = this.buildOrderBy(ordering);
 
 		const jobRoles: JobRole[] = await prisma.jobRole.findMany({
 			where,
 			skip: skip,
 			take: take,
-			orderBy: { jobRoleId: "asc" },
+			orderBy,
 		});
 		const totalCount = await prisma.jobRole.count({ where });
 		const jobs = await Promise.all(

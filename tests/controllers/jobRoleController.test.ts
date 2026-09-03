@@ -46,6 +46,7 @@ describe("JobRoleController - getAllJobRoles", async () => {
 			0,
 			10,
 			{},
+			{ sortBy: undefined, sortOrder: undefined },
 		);
 		expect(mockResponse.status).toHaveBeenCalledWith(200);
 		expect(mockResponse.json).toHaveBeenCalledWith({
@@ -77,6 +78,7 @@ describe("JobRoleController - getAllJobRoles", async () => {
 			10,
 			10,
 			{},
+			{ sortBy: undefined, sortOrder: undefined },
 		);
 		expect(mockResponse.status).toHaveBeenCalledWith(200);
 		expect(mockResponse.json).toHaveBeenCalledWith({
@@ -127,6 +129,7 @@ describe("JobRoleController - getAllJobRoles", async () => {
 				capability: ["Engineering", "Data"],
 				status: ["Open"],
 			},
+			{ sortBy: undefined, sortOrder: undefined },
 		);
 		expect(mockResponse.status).toHaveBeenCalledWith(200);
 		expect(mockResponse.json).toHaveBeenCalledWith({
@@ -140,6 +143,28 @@ describe("JobRoleController - getAllJobRoles", async () => {
 				hasPrev: false,
 			},
 		});
+	});
+
+	it("should forward ordering separately from filters", async () => {
+		mockResponse.locals.validatedQuery = {
+			page: 1,
+			roleName: "engineer",
+			sortBy: "roleName",
+			sortOrder: "desc",
+		};
+		mockJobRoleService.findPaginatedJobRoles = vi.fn().mockResolvedValue({
+			jobs: [],
+			totalCount: 0,
+		});
+
+		await jobRoleController.getAllJobRoles(mockRequest, mockResponse);
+
+		expect(mockJobRoleService.findPaginatedJobRoles).toHaveBeenCalledWith(
+			0,
+			10,
+			{ roleName: "engineer" },
+			{ sortBy: "roleName", sortOrder: "desc" },
+		);
 	});
 });
 

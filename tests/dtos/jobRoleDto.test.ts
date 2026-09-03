@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	IdParamSchema,
 	JobRoleDetailedResponse,
+	JobRoleFilterSchema,
 	JobRoleResponse,
 } from "../../src/dtos/jobRoleDto";
 
@@ -19,6 +20,22 @@ describe("JobRole DTOs", () => {
 		if (!result.success) {
 			expect(result.error.issues[0]?.message).toContain("positive integer");
 		}
+	});
+
+	it("accepts a valid ordering query", () => {
+		const result = JobRoleFilterSchema.parse({
+			sortBy: "roleName",
+			sortOrder: "desc",
+		});
+
+		expect(result.sortBy).toBe("roleName");
+		expect(result.sortOrder).toBe("desc");
+	});
+
+	it("rejects ordering when sortBy and sortOrder are not provided together", () => {
+		const result = JobRoleFilterSchema.safeParse({ sortBy: "roleName" });
+
+		expect(result.success).toBe(false);
 	});
 
 	it("creates a JobRoleResponse with required fields", () => {
