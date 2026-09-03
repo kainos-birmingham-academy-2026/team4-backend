@@ -149,6 +149,44 @@ describe("JobRoleService - findPaginatedJobRoles", () => {
 			orderBy: { jobRoleId: "asc" },
 		});
 	});
+
+	it("should order by a direct job role field", async () => {
+		vi.mocked(prisma).jobRole.findMany = vi.fn().mockResolvedValue([]);
+		vi.mocked(prisma).jobRole.count = vi.fn().mockResolvedValue(0);
+
+		await jobRoleService.findPaginatedJobRoles(
+			0,
+			10,
+			{},
+			{ sortBy: "roleName", sortOrder: "desc" },
+		);
+
+		expect(vi.mocked(prisma).jobRole.findMany).toHaveBeenCalledWith({
+			where: {},
+			skip: 0,
+			take: 10,
+			orderBy: { roleName: "desc" },
+		});
+	});
+
+	it("should order by a related job role field", async () => {
+		vi.mocked(prisma).jobRole.findMany = vi.fn().mockResolvedValue([]);
+		vi.mocked(prisma).jobRole.count = vi.fn().mockResolvedValue(0);
+
+		await jobRoleService.findPaginatedJobRoles(
+			0,
+			10,
+			{},
+			{ sortBy: "capability", sortOrder: "asc" },
+		);
+
+		expect(vi.mocked(prisma).jobRole.findMany).toHaveBeenCalledWith({
+			where: {},
+			skip: 0,
+			take: 10,
+			orderBy: { capability: { capabilityName: "asc" } },
+		});
+	});
 });
 
 describe("JobRoleService - findPaginatedJobRoles filtering", () => {

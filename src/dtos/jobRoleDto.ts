@@ -26,18 +26,50 @@ const toEndOfDay = (date: Date) =>
 		),
 	);
 
-export const JobRoleFilterSchema = z.object({
-	page: z.coerce.number().int().positive().default(1),
-	roleName: FreeTextFilter,
-	location: FreeTextFilter,
-	capability: StringArrayFilter,
-	band: StringArrayFilter,
-	status: StringArrayFilter,
-	closingDate: z.coerce.date().transform(toEndOfDay).optional(),
-});
+const SortBySchema = z.enum([
+	"jobRoleId",
+	"roleName",
+	"location",
+	"capability",
+	"band",
+	"closingDate",
+	"status",
+]);
+
+const SortOrderSchema = z.enum(["asc", "desc"]);
+
+export const JobRoleFilterSchema = z
+	.object({
+		page: z.coerce.number().int().positive().default(1),
+		roleName: FreeTextFilter,
+		location: FreeTextFilter,
+		capability: StringArrayFilter,
+		band: StringArrayFilter,
+		status: StringArrayFilter,
+		closingDate: z.coerce.date().transform(toEndOfDay).optional(),
+		sortBy: SortBySchema.optional(),
+		sortOrder: SortOrderSchema.optional(),
+	})
+	.refine(
+		({ sortBy, sortOrder }) =>
+			(sortBy === undefined && sortOrder === undefined) ||
+			(sortBy !== undefined && sortOrder !== undefined),
+		{
+			message: "sortBy and sortOrder must be provided together",
+			path: ["sortBy"],
+		},
+	);
 
 export type JobRoleQuery = z.infer<typeof JobRoleFilterSchema>;
-export type JobRoleFilters = Omit<JobRoleQuery, "page">;
+export type JobRoleFilters = Omit<
+	JobRoleQuery,
+	"page" | "sortBy" | "sortOrder"
+>;
+
+export type JobRoleOrdering = {
+	sortBy?: JobRoleQuery["sortBy"];
+	sortOrder?: JobRoleQuery["sortOrder"];
+};
 
 export class JobRoleResponse {
 	constructor(
