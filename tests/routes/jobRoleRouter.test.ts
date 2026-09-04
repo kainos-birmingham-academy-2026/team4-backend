@@ -279,3 +279,35 @@ describe("PUT /api/job-roles/:id", () => {
 		expect(response.body).toEqual({ error: "Job role not found" });
 	});
 });
+
+describe("DELETE /api/job-roles/:id", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("deletes a job role with status 204", async () => {
+		mockService.deleteJobRole = vi.fn().mockResolvedValue(true);
+
+		const response = await request(testApp).delete("/api/job-roles/1");
+
+		expect(response.status).toBe(204);
+		expect(mockService.deleteJobRole).toHaveBeenCalledWith(1);
+	});
+
+	it("returns 404 when the job role does not exist", async () => {
+		mockService.deleteJobRole = vi.fn().mockResolvedValue(false);
+
+		const response = await request(testApp).delete("/api/job-roles/999");
+
+		expect(response.status).toBe(404);
+		expect(response.body).toEqual({ error: "Job role not found" });
+	});
+
+	it("returns 400 when the id is invalid", async () => {
+		const response = await request(testApp).delete("/api/job-roles/abc");
+
+		expect(response.status).toBe(400);
+		expect(response.body.errors).toBeDefined();
+		expect(mockService.deleteJobRole).not.toHaveBeenCalled();
+	});
+});
