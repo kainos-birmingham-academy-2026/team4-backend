@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
 	IdParamSchema,
+	JobRoleCreateSchema,
 	JobRoleDetailedResponse,
 	JobRoleFilterSchema,
 	JobRoleResponse,
@@ -34,6 +35,45 @@ describe("JobRole DTOs", () => {
 
 	it("rejects ordering when sortBy and sortOrder are not provided together", () => {
 		const result = JobRoleFilterSchema.safeParse({ sortBy: "roleName" });
+
+		expect(result.success).toBe(false);
+	});
+
+	it("accepts a valid job role creation payload", () => {
+		const result = JobRoleCreateSchema.safeParse({
+			roleName: "Software Engineer",
+			description: "Develop software applications.",
+			sharepointUrl: "https://sharepoint.example.com/job-role",
+			responsibilities: ["Write code", "Review code"],
+			numberOfOpenPositions: "3",
+			location: "Birmingham",
+			closingDate: "2026-12-31",
+			capabilityId: "1",
+			bandId: "2",
+		});
+
+		expect(result.success).toBe(true);
+
+		if (result.success) {
+			expect(result.data.numberOfOpenPositions).toBe(3);
+			expect(result.data.capabilityId).toBe(1);
+			expect(result.data.bandId).toBe(2);
+			expect(result.data.closingDate).toBeInstanceOf(Date);
+		}
+	});
+
+	it("rejects an invalid job role creation payload", () => {
+		const result = JobRoleCreateSchema.safeParse({
+			roleName: "",
+			description: "",
+			sharepointUrl: "not-a-url",
+			responsibilities: [],
+			numberOfOpenPositions: -1,
+			location: "",
+			closingDate: "invalid-date",
+			capabilityId: 0,
+			bandId: 0,
+		});
 
 		expect(result.success).toBe(false);
 	});

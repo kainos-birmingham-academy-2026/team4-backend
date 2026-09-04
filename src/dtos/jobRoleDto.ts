@@ -71,6 +71,20 @@ export type JobRoleOrdering = {
 	sortOrder?: JobRoleQuery["sortOrder"];
 };
 
+export const JobRoleCreateSchema = z.object({
+	roleName: z.string().trim().min(1).max(200),
+	description: z.string().trim().min(1).max(5000),
+	sharepointUrl: z.url(),
+	responsibilities: z.array(z.string().trim().min(1).max(1000)).min(1),
+	numberOfOpenPositions: z.coerce.number().int().min(0),
+	location: z.string().trim().min(1).max(200),
+	closingDate: z.coerce.date(),
+	capabilityId: z.coerce.number().int().positive(),
+	bandId: z.coerce.number().int().positive(),
+});
+
+export type JobRoleCreateInput = z.infer<typeof JobRoleCreateSchema>;
+
 export class JobRoleResponse {
 	constructor(
 		public readonly jobRoleId: number,

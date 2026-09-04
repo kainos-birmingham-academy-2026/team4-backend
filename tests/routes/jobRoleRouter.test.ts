@@ -24,6 +24,18 @@ const mockFindPaginatedJobRoles = vi.fn().mockResolvedValue({
 });
 const mockService = new (vi.mocked(JobRoleService))();
 
+const createJobRolePayload = {
+	roleName: "Software Engineer",
+	description: "Develop software applications.",
+	sharepointUrl: "https://sharepoint.example.com/job-role",
+	responsibilities: ["Write code", "Review code"],
+	numberOfOpenPositions: 3,
+	location: "Birmingham",
+	closingDate: "2026-12-31",
+	capabilityId: 1,
+	bandId: 2,
+};
+
 const testApp = express();
 testApp.use(express.json());
 testApp.use(express.urlencoded({ extended: true }));
@@ -95,5 +107,127 @@ describe("GET /api/job-roles/:id", async () => {
 
 		expect(response.status).toBe(400);
 		expect(response.body.errors).toBeDefined();
+	});
+});
+
+describe("GET /api/job-roles/create-options", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("returns capability and band IDs with status 200", async () => {
+		mockService.findCreateOptions = vi.fn().mockResolvedValue({
+			capabilities: [{ id: 1, name: "Engineering" }],
+			bands: [{ id: 2, name: "Trainee" }],
+		});
+
+		const response = await request(testApp).get(
+			"/api/job-roles/create-options",
+		);
+
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({
+			capabilities: [{ id: 1, name: "Engineering" }],
+			bands: [{ id: 2, name: "Trainee" }],
+		});
+	});
+
+	it("returns 500 when options cannot be loaded", async () => {
+		mockService.findCreateOptions = vi
+			.fn()
+			.mockRejectedValue(new Error("Database error"));
+
+		const response = await request(testApp).get(
+			"/api/job-roles/create-options",
+		);
+
+		expect(response.status).toBe(500);
+		expect(response.body).toEqual({ error: "Internal server error" });
+	});
+});
+
+describe("POST /api/job-roles", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("should create a job role with status 201", async () => {
+		mockService.createJobRole = vi.fn().mockResolvedValue({
+			jobRoleId: 3,
+			roleName: "Software Engineer",
+			location: "Birmingham",
+			capability: "Engineering",
+			band: "Trainee",
+			closingDate: new Date("2026-12-31"),
+			status: "Open",
+			description: "Develop software applications.",
+			responsibilities: ["Write code", "Review code"],
+			sharepointUrl: "https://sharepoint.example.com/job-role",
+			numberOfOpenPositions: 3,
+		});
+
+		const response = await request(testApp)
+			.post("/api/job-roles/")
+			.send(createJobRolePayload);
+
+		expect(response.status).toBe(201);
+		expect(response.body.status).toBe("Open");
+		expect(mockService.createJobRole).toHaveBeenCalledWith({
+			...createJobRolePayload,
+			closingDate: new Date("2026-12-31"),
+		});
+	});
+
+	it("should return 400 for an invalid request body", async () => {
+		const response = await request(testApp)
+			.post("/api/job-roles/")
+			.send({
+				...createJobRolePayload,
+				roleName: "",
+				numberOfOpenPositions: -1,
+			});
+
+		expect(response.status).toBe(400);
+		expect(response.body.errors).toBeDefined();
+		expect(mockService.createJobRole).not.toHaveBeenCalled();
+	});
+
+	it("should return 400 when the capability does not exist", async () => {
+		mockService.createJobRole = vi
+			.fn()
+			.mockRejectedValue(new Error("Capability not found"));
+
+		const response = await request(testApp)
+			.post("/api/job-roles/")
+			.send(createJobRolePayload);
+
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({ error: "Capability not found" });
+	});
+
+	it("should return 400 when the band does not exist", async () => {
+		mockService.createJobRole = vi
+			.fn()
+			.mockRejectedValue(new Error("Band not found"));
+
+		const response = await request(testApp)
+			.post("/api/job-roles/")
+			.send(createJobRolePayload);
+
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({ error: "Band not found" });
+	});
+
+	it("should return 500 when creation fails unexpectedly", async () => {
+		mockService.createJobRole = vi
+			.fn()
+			.mockRejectedValue(new Error("Database error"));
+
+		const response = await request(testApp)
+			.post("/api/job-roles/")
+			.send(createJobRolePayload);
+
+		expect(response.status).toBe(500);
+		expect(response.body).toEqual({ error: "Internal server error" });
 	});
 });

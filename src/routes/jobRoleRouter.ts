@@ -1,8 +1,16 @@
 import { Router } from "express";
 import { JobRoleController } from "../controllers/jobRoleController.js";
-import { IdParamSchema, JobRoleFilterSchema } from "../dtos/jobRoleDto.js";
+import {
+	IdParamSchema,
+	JobRoleCreateSchema,
+	JobRoleFilterSchema,
+} from "../dtos/jobRoleDto.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
-import { validateParams, validateQuery } from "../middlewares/validate.js";
+import {
+	validateBody,
+	validateParams,
+	validateQuery,
+} from "../middlewares/validate.js";
 import { JobRoleService } from "../services/jobRoleService.js";
 
 export const createJobRoleRouter = (
@@ -22,6 +30,11 @@ export const createJobRoleRouter = (
 	);
 	router.get("/filter-options", controller.getFilterOptions.bind(controller));
 	router.get(
+		"/create-options",
+		requireAuth(true),
+		controller.getCreateOptions.bind(controller),
+	);
+	router.get(
 		"/:id",
 		validateParams(IdParamSchema),
 		controller.getJobRoleById.bind(controller),
@@ -30,7 +43,11 @@ export const createJobRoleRouter = (
 	//The following routes are protected and require authentication
 	router.use(requireAuth(true));
 
-	router.post("/", controller.create.bind(controller));
+	router.post(
+		"/",
+		validateBody(JobRoleCreateSchema),
+		controller.create.bind(controller),
+	);
 	router.put("/:id", controller.update.bind(controller));
 	router.delete("/:id", controller.delete.bind(controller));
 
