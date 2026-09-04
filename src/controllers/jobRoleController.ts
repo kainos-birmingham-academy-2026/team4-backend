@@ -127,5 +127,19 @@ export class JobRoleController {
 		}
 	}
 
-	async delete() {}
+	async delete(req: Request, res: Response): Promise<void> {
+		const id = Number(req.params.id);
+
+		try {
+			const deleted = await this.jobRoleService.deleteJobRole(id);
+			if (!deleted) {
+				res.status(404).json({ error: "Job role not found" });
+				return;
+			}
+
+			res.status(204).send();
+		} catch (_error) {
+			res.status(500).json({ error: "Internal server error" });
+		}
+	}
 }
