@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import type { JobRoleQuery } from "../dtos/jobRoleDto.js";
+import type { JobRoleCreateInput, JobRoleQuery } from "../dtos/jobRoleDto.js";
 import { JobRoleService } from "../services/jobRoleService.js";
 
 export class JobRoleController {
@@ -50,6 +50,15 @@ export class JobRoleController {
 		}
 	}
 
+	async getCreateOptions(req: Request, res: Response): Promise<void> {
+		try {
+			const options = await this.jobRoleService.findCreateOptions();
+			res.status(200).json(options);
+		} catch (_error) {
+			res.status(500).json({ error: "Internal server error" });
+		}
+	}
+
 	async getJobRoleById(req: Request, res: Response): Promise<void> {
 		const id = Number(req.params.id);
 
@@ -66,7 +75,26 @@ export class JobRoleController {
 	}
 
 	// The following methods are placeholders for future implementation
-	async create() {}
+	async create(req: Request, res: Response): Promise<void> {
+		try {
+			const jobRole = await this.jobRoleService.createJobRole(
+				req.body as JobRoleCreateInput,
+			);
+			res.status(201).json(jobRole);
+		} catch (error) {
+			if (
+				error instanceof Error &&
+				(error.message === "Capability not found" ||
+					error.message === "Band not found" ||
+					error.message === "Open status not found")
+			) {
+				res.status(400).json({ error: error.message });
+				return;
+			}
+
+			res.status(500).json({ error: "Internal server error" });
+		}
+	}
 
 	async update() {}
 

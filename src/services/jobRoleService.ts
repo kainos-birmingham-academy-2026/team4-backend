@@ -1,5 +1,6 @@
 import type { JobRole, Prisma } from "@prisma/client";
 import type {
+	JobRoleCreateInput,
 	JobRoleDetailedResponse,
 	JobRoleFilters,
 	JobRoleOrdering,
@@ -119,5 +120,71 @@ export class JobRoleService {
 			bands: bands.map((b) => b.bandName),
 			statuses: statuses.map((s) => s.statusName),
 		};
+	}
+
+	async findCreateOptions(): Promise<{
+		capabilities: { id: number; name: string }[];
+		bands: { id: number; name: string }[];
+	}> {
+		const [capabilities, bands] = await Promise.all([
+			prisma.capability.findMany({
+				select: { capabilityId: true, capabilityName: true },
+				orderBy: { capabilityName: "asc" },
+			}),
+			prisma.band.findMany({
+				select: { bandId: true, bandName: true },
+				orderBy: { bandName: "asc" },
+			}),
+		]);
+
+		return {
+			capabilities: capabilities.map(({ capabilityId, capabilityName }) => ({
+				id: capabilityId,
+				name: capabilityName,
+			})),
+			bands: bands.map(({ bandId, bandName }) => ({
+				id: bandId,
+				name: bandName,
+			})),
+		};
+	}
+
+	async createJobRole(
+		input: JobRoleCreateInput,
+	): Promise<JobRoleDetailedResponse> {
+		const [capability, band, openStatus] = await Promise.all([
+			prisma.capability.findUnique({
+				where: { capabilityId: input.capabilityId },
+			}),
+			prisma.band.findUnique({ where: { bandId: input.bandId } }),
+			prisma.status.findUnique({ where: { statusName: "Open" } }),
+		]);
+
+		if (!capability) {
+			throw new Error("Capability not found");
+		}
+		if (!band) {
+			throw new Error("Band not found");
+		}
+		if (!openStatus) {
+			throw new Error("Open status not found");
+		}
+
+		const jobRole = await prisma.jobRole.create({
+			data: {
+				roleName: input.roleName,
+				description: input.description,
+				sharepointUrl: input.sharepointUrl,
+				responsibilities: input.responsibilities,
+				numberOfOpenPositions: input.numberOfOpenPositions,
+				location: input.location,
+				closingDate: input.closingDate,
+				capabilityId: capability.capabilityId,
+				bandId: band.bandId,
+				statusId: openStatus.statusId,
+			},
+		});
+
+		return this.jobRoleMapper.mapJobRoleToDetailedResponse(jobRole);
 	}
 }
