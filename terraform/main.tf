@@ -78,6 +78,12 @@ data "azurerm_container_registry" "shared" {
   resource_group_name = var.acr_resource_group_name
 }
 
+resource "azurerm_role_assignment" "backend_acr_pull" {
+  scope                = data.azurerm_container_registry.shared.id
+  role_definition_name = "AcrPull"
+  principal_id         = module.managed_identity.principal_id
+}
+
 module "backend_container_app" {
   source = "./modules/container-app"
 
