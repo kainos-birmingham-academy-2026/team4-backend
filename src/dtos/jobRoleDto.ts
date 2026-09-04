@@ -85,6 +85,12 @@ export const JobRoleCreateSchema = z.object({
 
 export type JobRoleCreateInput = z.infer<typeof JobRoleCreateSchema>;
 
+export const JobRoleUpdateSchema = JobRoleCreateSchema.extend({
+	statusId: z.coerce.number().int().positive(),
+});
+
+export type JobRoleUpdateInput = z.infer<typeof JobRoleUpdateSchema>;
+
 export class JobRoleResponse {
 	constructor(
 		public readonly jobRoleId: number,
@@ -94,6 +100,9 @@ export class JobRoleResponse {
 		public readonly band: string,
 		public readonly closingDate: Date | null,
 		public readonly status: string,
+		public readonly capabilityId?: number,
+		public readonly bandId?: number,
+		public readonly statusId?: number,
 	) {
 		if (!roleName || !location || !capability || !band) {
 			throw new Error(
@@ -116,7 +125,21 @@ export class JobRoleDetailedResponse extends JobRoleResponse {
 		public readonly responsibilities: string[],
 		public readonly sharepointUrl: string,
 		public readonly numberOfOpenPositions: number,
+		capabilityId?: number,
+		bandId?: number,
+		statusId?: number,
 	) {
-		super(jobRoleId, roleName, location, capability, band, closingDate, status);
+		super(
+			jobRoleId,
+			roleName,
+			location,
+			capability,
+			band,
+			closingDate,
+			status,
+			capabilityId,
+			bandId,
+			statusId,
+		);
 	}
 }

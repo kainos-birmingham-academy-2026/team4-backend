@@ -4,6 +4,7 @@ import {
 	IdParamSchema,
 	JobRoleCreateSchema,
 	JobRoleFilterSchema,
+	JobRoleUpdateSchema,
 } from "../dtos/jobRoleDto.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import {
@@ -48,7 +49,12 @@ export const createJobRoleRouter = (
 		validateBody(JobRoleCreateSchema),
 		controller.create.bind(controller),
 	);
-	router.put("/:id", controller.update.bind(controller));
+	router.put(
+		"/:id",
+		validateParams(IdParamSchema),
+		validateBody(JobRoleUpdateSchema),
+		controller.update.bind(controller),
+	);
 	router.delete("/:id", controller.delete.bind(controller));
 
 	return router;

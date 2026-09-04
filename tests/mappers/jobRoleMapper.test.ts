@@ -44,7 +44,12 @@ describe("jobRoleMapper - mapJobRoleToResponse", () => {
 			.mockResolvedValue({ statusName: mockJobRoleResponse1.status });
 
 		const result = await jobRoleMapper.mapJobRoleToResponse(mockJobRole1);
-		expect(result).toEqual(mockJobRoleResponse1 as JobRoleResponse);
+		expect(result).toMatchObject({
+			...(mockJobRoleResponse1 as JobRoleResponse),
+			capabilityId: 1,
+			bandId: 1,
+			statusId: 1,
+		});
 	});
 
 	it("should use the value 'Unknown' if a field name isn't found", async () => {
@@ -76,7 +81,12 @@ describe("jobRoleMapper - mapJobRoleToDetailedResponse", () => {
 
 		const result =
 			await jobRoleMapper.mapJobRoleToDetailedResponse(mockJobRole1);
-		expect(result).toEqual(mockJobRoleDetailedResponse1);
+		expect(result).toMatchObject({
+			...mockJobRoleDetailedResponse1,
+			capabilityId: 1,
+			bandId: 1,
+			statusId: 1,
+		});
 	});
 
 	it("should use the value 'Unknown' if a field name isn't found", async () => {

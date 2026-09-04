@@ -5,6 +5,7 @@ import type {
 	JobRoleFilters,
 	JobRoleOrdering,
 	JobRoleResponse,
+	JobRoleUpdateInput,
 } from "../dtos/jobRoleDto.js";
 import { JobRoleMapper } from "../mappers/jobRoleMapper.js";
 import prisma from "../prismaClient.js";
@@ -125,8 +126,9 @@ export class JobRoleService {
 	async findCreateOptions(): Promise<{
 		capabilities: { id: number; name: string }[];
 		bands: { id: number; name: string }[];
+		statuses: { id: number; name: string }[];
 	}> {
-		const [capabilities, bands] = await Promise.all([
+		const [capabilities, bands, statuses] = await Promise.all([
 			prisma.capability.findMany({
 				select: { capabilityId: true, capabilityName: true },
 				orderBy: { capabilityName: "asc" },
@@ -134,6 +136,10 @@ export class JobRoleService {
 			prisma.band.findMany({
 				select: { bandId: true, bandName: true },
 				orderBy: { bandName: "asc" },
+			}),
+			prisma.status.findMany({
+				select: { statusId: true, statusName: true },
+				orderBy: { statusName: "asc" },
 			}),
 		]);
 
@@ -145,6 +151,10 @@ export class JobRoleService {
 			bands: bands.map(({ bandId, bandName }) => ({
 				id: bandId,
 				name: bandName,
+			})),
+			statuses: statuses.map(({ statusId, statusName }) => ({
+				id: statusId,
+				name: statusName,
 			})),
 		};
 	}
@@ -182,6 +192,55 @@ export class JobRoleService {
 				capabilityId: capability.capabilityId,
 				bandId: band.bandId,
 				statusId: openStatus.statusId,
+			},
+		});
+
+		return this.jobRoleMapper.mapJobRoleToDetailedResponse(jobRole);
+	}
+
+	async updateJobRole(
+		id: number,
+		input: JobRoleUpdateInput,
+	): Promise<JobRoleDetailedResponse | null> {
+		const existingJobRole = await prisma.jobRole.findUnique({
+			where: { jobRoleId: id },
+		});
+
+		if (!existingJobRole) {
+			return null;
+		}
+
+		const [capability, band, status] = await Promise.all([
+			prisma.capability.findUnique({
+				where: { capabilityId: input.capabilityId },
+			}),
+			prisma.band.findUnique({ where: { bandId: input.bandId } }),
+			prisma.status.findUnique({ where: { statusId: input.statusId } }),
+		]);
+
+		if (!capability) {
+			throw new Error("Capability not found");
+		}
+		if (!band) {
+			throw new Error("Band not found");
+		}
+		if (!status) {
+			throw new Error("Status not found");
+		}
+
+		const jobRole = await prisma.jobRole.update({
+			where: { jobRoleId: id },
+			data: {
+				roleName: input.roleName,
+				description: input.description,
+				sharepointUrl: input.sharepointUrl,
+				responsibilities: input.responsibilities,
+				numberOfOpenPositions: input.numberOfOpenPositions,
+				location: input.location,
+				closingDate: input.closingDate,
+				capabilityId: capability.capabilityId,
+				bandId: band.bandId,
+				statusId: status.statusId,
 			},
 		});
 

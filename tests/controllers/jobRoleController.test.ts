@@ -213,3 +213,69 @@ describe("JobRoleController - getJobRoleById", async () => {
 		});
 	});
 });
+
+describe("JobRoleController - update", () => {
+	let jobRoleController: JobRoleController;
+	const updateInput = {
+		roleName: "Senior Software Engineer",
+		statusId: 2,
+	};
+
+	beforeEach(() => {
+		jobRoleController = new JobRoleController(mockJobRoleService);
+		vi.clearAllMocks();
+		mockRequest.params.id = "1";
+		mockRequest.body = updateInput;
+	});
+
+	it("returns the updated role with status 200", async () => {
+		mockJobRoleService.updateJobRole = vi.fn().mockResolvedValue(mockJobRole1);
+
+		await jobRoleController.update(mockRequest, mockResponse);
+
+		expect(mockJobRoleService.updateJobRole).toHaveBeenCalledWith(
+			1,
+			updateInput,
+		);
+		expect(mockResponse.status).toHaveBeenCalledWith(200);
+		expect(mockResponse.json).toHaveBeenCalledWith(mockJobRole1);
+	});
+
+	it("returns 404 when the role does not exist", async () => {
+		mockJobRoleService.updateJobRole = vi.fn().mockResolvedValue(null);
+
+		await jobRoleController.update(mockRequest, mockResponse);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(404);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			error: "Job role not found",
+		});
+	});
+
+	it.each(["Capability not found", "Band not found", "Status not found"])(
+		"returns 400 when %s",
+		async (message) => {
+			mockJobRoleService.updateJobRole = vi
+				.fn()
+				.mockRejectedValue(new Error(message));
+
+			await jobRoleController.update(mockRequest, mockResponse);
+
+			expect(mockResponse.status).toHaveBeenCalledWith(400);
+			expect(mockResponse.json).toHaveBeenCalledWith({ error: message });
+		},
+	);
+
+	it("returns 500 for an unexpected update error", async () => {
+		mockJobRoleService.updateJobRole = vi
+			.fn()
+			.mockRejectedValue(new Error("Database error"));
+
+		await jobRoleController.update(mockRequest, mockResponse);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(500);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			error: "Internal server error",
+		});
+	});
+});
