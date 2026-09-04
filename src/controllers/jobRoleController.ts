@@ -7,7 +7,7 @@ export class JobRoleController {
 		private readonly jobRoleService: JobRoleService = new JobRoleService(),
 	) {}
 
-	async getAllJobRoles(req: Request, res: Response): Promise<void> {
+	async getAllJobRoles(_req: Request, res: Response): Promise<void> {
 		try {
 			const { page, sortBy, sortOrder, ...filters } = (res.locals
 				.validatedQuery ?? {
@@ -41,7 +41,7 @@ export class JobRoleController {
 		}
 	}
 
-	async getFilterOptions(req: Request, res: Response): Promise<void> {
+	async getFilterOptions(_req: Request, res: Response): Promise<void> {
 		try {
 			const options = await this.jobRoleService.findFilterOptions();
 			res.status(200).json(options);

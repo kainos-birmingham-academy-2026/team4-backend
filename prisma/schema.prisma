@@ -1,19 +1,13 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-
 enum UserType {
   USER
   ADMIN
 }
 
 generator client {
-
-  provider      = "prisma-client-js"
-
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -22,46 +16,63 @@ datasource db {
 }
 
 model JobRole {
-  jobRoleId   Int      @id @default(autoincrement())
-  roleName    String
-  location    String
-  capabilityId Int  
-  bandId      Int
-  closingDate  DateTime?
-  statusId     Int
-  description  String
-  responsibilities String[]
-  sharepointUrl String
+  jobRoleId             Int      @id @default(autoincrement())
+  roleName              String
+  location              String
+  capabilityId          Int
+  bandId                Int
+  closingDate           DateTime?
+  statusId              Int
+  description           String
+  responsibilities      String[]
+  sharepointUrl         String
   numberOfOpenPositions Int
 
-
-  capability Capability @relation(fields: [capabilityId], references: [capabilityId])
-  band      Band       @relation(fields: [bandId], references: [bandId])
-  status    Status     @relation(fields: [statusId], references: [statusId])
+  capability   Capability    @relation(fields: [capabilityId], references: [capabilityId])
+  band         Band          @relation(fields: [bandId], references: [bandId])
+  status       Status        @relation(fields: [statusId], references: [statusId])
+  applications Application[]
 }
 
 model Capability {
-  capabilityId Int      @id @default(autoincrement())
-  capabilityName String @unique
-  jobRoles   JobRole[]
+  capabilityId   Int       @id @default(autoincrement())
+  capabilityName String    @unique
+  jobRoles       JobRole[]
 }
 
 model Band {
-  bandId Int @id @default(autoincrement())
-  bandName String @unique
+  bandId   Int       @id @default(autoincrement())
+  bandName String    @unique
   jobRoles JobRole[]
 }
 
 model Status {
-  statusId Int @id @default(autoincrement())
-  statusName String @unique
-  jobRoles JobRole[]
+  statusId     Int           @id @default(autoincrement())
+  statusName   String        @unique
+  jobRoles     JobRole[]
+  applications Application[]
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
   passwordHash String
-  role UserType @default(USER)
-  createdAt DateTime @default(now())
+  role         UserType      @default(USER)
+  createdAt    DateTime      @default(now())
+  applications Application[]
+}
+
+model Application {
+  applicationId Int      @id @default(autoincrement())
+  jobRoleId     Int
+  userId        Int
+  message       String
+  statusId      Int
+  createdAt     DateTime @default(now())
+
+  jobRole JobRole @relation(fields: [jobRoleId], references: [jobRoleId])
+  user    User    @relation(fields: [userId], references: [id])
+  status  Status  @relation(fields: [statusId], references: [statusId])
+
+  @@unique([jobRoleId, userId])
 }
