@@ -231,3 +231,51 @@ describe("POST /api/job-roles", () => {
 		expect(response.body).toEqual({ error: "Internal server error" });
 	});
 });
+
+describe("PUT /api/job-roles/:id", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("updates a job role with status 200", async () => {
+		mockService.updateJobRole = vi.fn().mockResolvedValue({
+			jobRoleId: 1,
+			...createJobRolePayload,
+			capability: "Engineering",
+			band: "Trainee",
+			status: "Closed",
+		});
+
+		const response = await request(testApp)
+			.put("/api/job-roles/1")
+			.send({ ...createJobRolePayload, statusId: 1 });
+
+		expect(response.status).toBe(200);
+		expect(mockService.updateJobRole).toHaveBeenCalledWith(1, {
+			...createJobRolePayload,
+			closingDate: new Date("2026-12-31"),
+			statusId: 1,
+		});
+	});
+
+	it("returns 400 for an invalid update body", async () => {
+		const response = await request(testApp)
+			.put("/api/job-roles/1")
+			.send({ ...createJobRolePayload, statusId: 0 });
+
+		expect(response.status).toBe(400);
+		expect(response.body.errors).toBeDefined();
+		expect(mockService.updateJobRole).not.toHaveBeenCalled();
+	});
+
+	it("returns 404 when the job role does not exist", async () => {
+		mockService.updateJobRole = vi.fn().mockResolvedValue(null);
+
+		const response = await request(testApp)
+			.put("/api/job-roles/999")
+			.send({ ...createJobRolePayload, statusId: 1 });
+
+		expect(response.status).toBe(404);
+		expect(response.body).toEqual({ error: "Job role not found" });
+	});
+});

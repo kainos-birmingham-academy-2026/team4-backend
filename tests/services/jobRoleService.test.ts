@@ -322,12 +322,20 @@ describe("JobRoleService - findCreateOptions", () => {
 		vi.mocked(prisma).band.findMany = vi
 			.fn()
 			.mockResolvedValue([{ bandId: 3, bandName: "Consultant" }]);
+		vi.mocked(prisma).status.findMany = vi.fn().mockResolvedValue([
+			{ statusId: 1, statusName: "Open" },
+			{ statusId: 2, statusName: "Closed" },
+		]);
 
 		const result = await jobRoleService.findCreateOptions();
 
 		expect(result).toEqual({
 			capabilities: [{ id: 2, name: "Engineering" }],
 			bands: [{ id: 3, name: "Consultant" }],
+			statuses: [
+				{ id: 1, name: "Open" },
+				{ id: 2, name: "Closed" },
+			],
 		});
 		expect(prisma.capability.findMany).toHaveBeenCalledWith({
 			select: { capabilityId: true, capabilityName: true },
@@ -447,5 +455,129 @@ describe("JobRoleService - createJobRole", () => {
 		).rejects.toThrow("Band not found");
 
 		expect(prisma.jobRole.create).not.toHaveBeenCalled();
+	});
+});
+
+describe("JobRoleService - updateJobRole", () => {
+	let jobRoleService: JobRoleService;
+	const input = {
+		roleName: "Senior Software Engineer",
+		description: "Lead software development.",
+		sharepointUrl: "https://sharepoint.example.com/job-role",
+		responsibilities: ["Design solutions"],
+		numberOfOpenPositions: 2,
+		location: "Belfast",
+		closingDate: new Date("2026-12-31"),
+		capabilityId: 1,
+		bandId: 2,
+		statusId: 3,
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+		mapJobRoleToDetailedResponseMock.mockReset();
+		jobRoleService = new JobRoleService();
+	});
+
+	it("updates all editable fields and maps the updated role", async () => {
+		vi.mocked(prisma).jobRole.findUnique = vi
+			.fn()
+			.mockResolvedValue(mockJobRole1);
+		vi.mocked(prisma).capability.findUnique = vi.fn().mockResolvedValue({
+			capabilityId: 1,
+			capabilityName: "Engineering",
+		});
+		vi.mocked(prisma).band.findUnique = vi.fn().mockResolvedValue({
+			bandId: 2,
+			bandName: "Trainee",
+		});
+		vi.mocked(prisma).status.findUnique = vi.fn().mockResolvedValue({
+			statusId: 3,
+			statusName: "Closed",
+		});
+		vi.mocked(prisma).jobRole.update = vi.fn().mockResolvedValue(mockJobRole1);
+		mapJobRoleToDetailedResponseMock.mockResolvedValue(
+			mockJobRoleDetailedResponse1,
+		);
+
+		const result = await jobRoleService.updateJobRole(1, input);
+
+		expect(result).toEqual(mockJobRoleDetailedResponse1);
+		expect(prisma.jobRole.update).toHaveBeenCalledWith({
+			where: { jobRoleId: 1 },
+			data: {
+				...input,
+				capabilityId: 1,
+				bandId: 2,
+				statusId: 3,
+			},
+		});
+	});
+
+	it("returns null when the role does not exist", async () => {
+		vi.mocked(prisma).jobRole.findUnique = vi.fn().mockResolvedValue(null);
+
+		const result = await jobRoleService.updateJobRole(999, input);
+
+		expect(result).toBeNull();
+		expect(prisma.jobRole.update).not.toHaveBeenCalled();
+	});
+
+	it("throws when the selected status does not exist", async () => {
+		vi.mocked(prisma).jobRole.findUnique = vi
+			.fn()
+			.mockResolvedValue(mockJobRole1);
+		vi.mocked(prisma).capability.findUnique = vi.fn().mockResolvedValue({
+			capabilityId: 1,
+			capabilityName: "Engineering",
+		});
+		vi.mocked(prisma).band.findUnique = vi.fn().mockResolvedValue({
+			bandId: 2,
+			bandName: "Trainee",
+		});
+		vi.mocked(prisma).status.findUnique = vi.fn().mockResolvedValue(null);
+
+		await expect(jobRoleService.updateJobRole(1, input)).rejects.toThrow(
+			"Status not found",
+		);
+		expect(prisma.jobRole.update).not.toHaveBeenCalled();
+	});
+
+	it("throws when the selected capability does not exist", async () => {
+		vi.mocked(prisma).jobRole.findUnique = vi
+			.fn()
+			.mockResolvedValue(mockJobRole1);
+		vi.mocked(prisma).capability.findUnique = vi.fn().mockResolvedValue(null);
+		vi.mocked(prisma).band.findUnique = vi.fn().mockResolvedValue({
+			bandId: 2,
+			bandName: "Trainee",
+		});
+		vi.mocked(prisma).status.findUnique = vi.fn().mockResolvedValue({
+			statusId: 3,
+			statusName: "Closed",
+		});
+
+		await expect(jobRoleService.updateJobRole(1, input)).rejects.toThrow(
+			"Capability not found",
+		);
+	});
+
+	it("throws when the selected band does not exist", async () => {
+		vi.mocked(prisma).jobRole.findUnique = vi
+			.fn()
+			.mockResolvedValue(mockJobRole1);
+		vi.mocked(prisma).capability.findUnique = vi.fn().mockResolvedValue({
+			capabilityId: 1,
+			capabilityName: "Engineering",
+		});
+		vi.mocked(prisma).band.findUnique = vi.fn().mockResolvedValue(null);
+		vi.mocked(prisma).status.findUnique = vi.fn().mockResolvedValue({
+			statusId: 3,
+			statusName: "Closed",
+		});
+
+		await expect(jobRoleService.updateJobRole(1, input)).rejects.toThrow(
+			"Band not found",
+		);
 	});
 });

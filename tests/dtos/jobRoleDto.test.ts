@@ -5,6 +5,7 @@ import {
 	JobRoleDetailedResponse,
 	JobRoleFilterSchema,
 	JobRoleResponse,
+	JobRoleUpdateSchema,
 } from "../../src/dtos/jobRoleDto";
 
 describe("JobRole DTOs", () => {
@@ -73,6 +74,43 @@ describe("JobRole DTOs", () => {
 			closingDate: "invalid-date",
 			capabilityId: 0,
 			bandId: 0,
+		});
+
+		expect(result.success).toBe(false);
+	});
+
+	it("accepts a valid job role update payload including status", () => {
+		const result = JobRoleUpdateSchema.safeParse({
+			roleName: "Senior Software Engineer",
+			description: "Lead software development.",
+			sharepointUrl: "https://sharepoint.example.com/job-role",
+			responsibilities: ["Design solutions"],
+			numberOfOpenPositions: "2",
+			location: "Belfast",
+			closingDate: "2026-12-31",
+			capabilityId: "1",
+			bandId: "2",
+			statusId: "3",
+		});
+
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.statusId).toBe(3);
+		}
+	});
+
+	it("rejects an update payload without a valid status", () => {
+		const result = JobRoleUpdateSchema.safeParse({
+			roleName: "Software Engineer",
+			description: "Develop software applications.",
+			sharepointUrl: "https://sharepoint.example.com/job-role",
+			responsibilities: ["Write code"],
+			numberOfOpenPositions: 1,
+			location: "Birmingham",
+			closingDate: "2026-12-31",
+			capabilityId: 1,
+			bandId: 2,
+			statusId: 0,
 		});
 
 		expect(result.success).toBe(false);
