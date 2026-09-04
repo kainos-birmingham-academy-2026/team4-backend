@@ -51,6 +51,7 @@ npm run prepare
 * `http://localhost:4000/api/job-roles` should return a JSON object containing a list of open job roles.
 * `http://localhost:4000/api/job-roles/:id` should return a JSON object detailing a specific job role.
 * `http://localhost:4000/api/job-roles/filter-options` should return a JSON object containing a list of filters to filter the job roles.
+* `http://localhost:4000/api/applications` handles job applications from applicant users.
 * `http://localhost:4000/auth/login` handles login requests.
 * `http://localhost:4000/auth/register` handles registration requests.
 

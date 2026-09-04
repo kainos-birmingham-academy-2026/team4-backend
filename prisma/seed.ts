@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
 	// Clear any existing data
+	await prisma.application.deleteMany();
 	await prisma.jobRole.deleteMany();
 	await prisma.capability.deleteMany();
 	await prisma.band.deleteMany();
@@ -39,7 +40,7 @@ async function main() {
 		"Executive",
 	];
 
-	const statuses = ["Open", "Closed"];
+	const statuses = ["Open", "Closed", "In Progress"];
 
 	const passwordHash = await argon2.hash("Password123!");
 	const adminPasswordHash = await argon2.hash("AdminPassword123!");
