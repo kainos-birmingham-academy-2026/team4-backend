@@ -95,7 +95,9 @@ describe("GET /api/job-roles/:id", async () => {
 		const response = await request(testApp).get(`/api/job-roles/1`);
 
 		expect(response.status).toBe(500);
-		expect(response.body).toEqual({ error: "Internal server error" });
+		expect(response.body).toEqual({
+			error: "Internal server error: Service error",
+		});
 	});
 
 	it("should return status 400 when the id is not a number", async () => {
@@ -145,7 +147,9 @@ describe("GET /api/job-roles/create-options", () => {
 		);
 
 		expect(response.status).toBe(500);
-		expect(response.body).toEqual({ error: "Internal server error" });
+		expect(response.body).toEqual({
+			error: "Internal server error: Database error",
+		});
 	});
 });
 
@@ -231,7 +235,9 @@ describe("POST /api/job-roles", () => {
 			.send(createJobRolePayload);
 
 		expect(response.status).toBe(500);
-		expect(response.body).toEqual({ error: "Internal server error" });
+		expect(response.body).toEqual({
+			error: "Internal server error: Database error",
+		});
 	});
 });
 

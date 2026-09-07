@@ -104,7 +104,7 @@ describe("JobRoleController - getAllJobRoles", async () => {
 
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
-			error: "Internal server error",
+			error: "Internal server error: Service error",
 		});
 	});
 
@@ -210,7 +210,7 @@ describe("JobRoleController - getJobRoleById", async () => {
 
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
-			error: "Internal server error",
+			error: "Internal server error: Service error",
 		});
 	});
 });
@@ -276,7 +276,7 @@ describe("JobRoleController - update", () => {
 
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
-			error: "Internal server error",
+			error: "Internal server error: Database error",
 		});
 	});
 });
@@ -320,7 +320,7 @@ describe("JobRoleController - delete", () => {
 
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
-			error: "Internal server error",
+			error: "Internal server error: Database error",
 		});
 	});
 });

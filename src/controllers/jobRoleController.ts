@@ -11,7 +11,12 @@ export class JobRoleController {
 		private readonly jobRoleService: JobRoleService = new JobRoleService(),
 	) {}
 
-	async getAllJobRoles(_req: Request, res: Response): Promise<void> {
+	private sendInternalServerError(res: Response, error: unknown): void {
+		const errorMessage = error instanceof Error ? `: ${error.message}` : "";
+		res.status(500).json({ error: `Internal server error${errorMessage}` });
+	}
+
+	async getAllJobRoles(req: Request, res: Response): Promise<void> {
 		try {
 			const { page, sortBy, sortOrder, ...filters } = (res.locals
 				.validatedQuery ?? {
@@ -40,8 +45,8 @@ export class JobRoleController {
 					hasPrev,
 				},
 			});
-		} catch (_error) {
-			res.status(500).json({ error: "Internal server error" });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -49,8 +54,8 @@ export class JobRoleController {
 		try {
 			const options = await this.jobRoleService.findFilterOptions();
 			res.status(200).json(options);
-		} catch (_error) {
-			res.status(500).json({ error: "Internal server error" });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -58,8 +63,8 @@ export class JobRoleController {
 		try {
 			const options = await this.jobRoleService.findCreateOptions();
 			res.status(200).json(options);
-		} catch (_error) {
-			res.status(500).json({ error: "Internal server error" });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -73,8 +78,8 @@ export class JobRoleController {
 				return;
 			}
 			res.status(200).json(jobRole);
-		} catch (_error) {
-			res.status(500).json({ error: "Internal server error" });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -95,7 +100,7 @@ export class JobRoleController {
 				return;
 			}
 
-			res.status(500).json({ error: "Internal server error" });
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -123,7 +128,7 @@ export class JobRoleController {
 				return;
 			}
 
-			res.status(500).json({ error: "Internal server error" });
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -138,8 +143,8 @@ export class JobRoleController {
 			}
 
 			res.status(204).send();
-		} catch (_error) {
-			res.status(500).json({ error: "Internal server error" });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
 		}
 	}
 }
