@@ -1,3 +1,4 @@
+import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -8,11 +9,7 @@ import { mockJobRoleResponse1, mockJobRoleResponses } from "../mockJobRoles";
 vi.mock("../../src/services/jobRoleService");
 vi.mock("../../src/middlewares/requireAuth", () => ({
 	requireAuth: vi.fn((_requireAdmin?: boolean) => {
-		return (
-			_req: express.Request,
-			_res: express.Response,
-			next: express.NextFunction,
-		) => {
+		return (_req: Request, _res: Response, next: NextFunction) => {
 			next();
 		};
 	}),
@@ -21,6 +18,7 @@ vi.mock("../../src/middlewares/requireAuth", () => ({
 // Set JWT_SECRET for test environment
 process.env.JWT_SECRET = "test-secret";
 
+const _mockFindAllJobRoles = vi.fn().mockResolvedValue(mockJobRoleResponses);
 const mockFindPaginatedJobRoles = vi.fn().mockResolvedValue({
 	jobs: mockJobRoleResponses,
 	totalCount: mockJobRoleResponses.length,

@@ -16,7 +16,7 @@ export class JobRoleController {
 		res.status(500).json({ error: `Internal server error${errorMessage}` });
 	}
 
-	async getAllJobRoles(req: Request, res: Response): Promise<void> {
+	async getAllJobRoles(_req: Request, res: Response): Promise<void> {
 		try {
 			const { page, sortBy, sortOrder, ...filters } = (res.locals
 				.validatedQuery ?? {
@@ -59,7 +59,7 @@ export class JobRoleController {
 		}
 	}
 
-	async getCreateOptions(req: Request, res: Response): Promise<void> {
+	async getCreateOptions(_req: Request, res: Response): Promise<void> {
 		try {
 			const options = await this.jobRoleService.findCreateOptions();
 			res.status(200).json(options);
