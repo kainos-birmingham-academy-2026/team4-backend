@@ -13,6 +13,7 @@ const mockRequest = {
 const mockResponse = {
 	status: vi.fn().mockReturnThis(),
 	json: vi.fn(),
+	send: vi.fn(),
 	locals: {} as Record<string, unknown>,
 } as unknown as Response;
 
@@ -103,7 +104,7 @@ describe("JobRoleController - getAllJobRoles", async () => {
 
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
-			error: "Internal server error",
+			error: "Internal server error: Service error",
 		});
 	});
 
@@ -209,7 +210,7 @@ describe("JobRoleController - getJobRoleById", async () => {
 
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
-			error: "Internal server error",
+			error: "Internal server error: Service error",
 		});
 	});
 });
@@ -275,7 +276,51 @@ describe("JobRoleController - update", () => {
 
 		expect(mockResponse.status).toHaveBeenCalledWith(500);
 		expect(mockResponse.json).toHaveBeenCalledWith({
-			error: "Internal server error",
+			error: "Internal server error: Database error",
+		});
+	});
+});
+
+describe("JobRoleController - delete", () => {
+	let jobRoleController: JobRoleController;
+
+	beforeEach(() => {
+		jobRoleController = new JobRoleController(mockJobRoleService);
+		vi.clearAllMocks();
+		mockRequest.params.id = "1";
+	});
+
+	it("returns 204 when the role is deleted", async () => {
+		mockJobRoleService.deleteJobRole = vi.fn().mockResolvedValue(true);
+
+		await jobRoleController.delete(mockRequest, mockResponse);
+
+		expect(mockJobRoleService.deleteJobRole).toHaveBeenCalledWith(1);
+		expect(mockResponse.status).toHaveBeenCalledWith(204);
+		expect(mockResponse.send).toHaveBeenCalled();
+	});
+
+	it("returns 404 when the role does not exist", async () => {
+		mockJobRoleService.deleteJobRole = vi.fn().mockResolvedValue(false);
+
+		await jobRoleController.delete(mockRequest, mockResponse);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(404);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			error: "Job role not found",
+		});
+	});
+
+	it("returns 500 when deletion fails", async () => {
+		mockJobRoleService.deleteJobRole = vi
+			.fn()
+			.mockRejectedValue(new Error("Database error"));
+
+		await jobRoleController.delete(mockRequest, mockResponse);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(500);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			error: "Internal server error: Database error",
 		});
 	});
 });

@@ -16,7 +16,9 @@ vi.mock("../../src/prismaClient", () => ({
 	default: {
 		jobRole: {
 			findMany: vi.fn(),
+			findUnique: vi.fn(),
 			create: vi.fn(),
+			delete: vi.fn(),
 		},
 		capability: {
 			findUnique: vi.fn(),
@@ -96,6 +98,38 @@ describe("JobRoleService - findJobRoleById", () => {
 
 		expect(result).toBeNull();
 		expect(mapJobRoleToDetailedResponseMock).not.toHaveBeenCalled();
+	});
+});
+
+describe("JobRoleService - deleteJobRole", () => {
+	let jobRoleService: JobRoleService;
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+		jobRoleService = new JobRoleService();
+	});
+
+	it("deletes the job role when it exists", async () => {
+		vi.mocked(prisma).jobRole.findUnique = vi
+			.fn()
+			.mockResolvedValue(mockJobRole1);
+		vi.mocked(prisma).jobRole.delete = vi.fn().mockResolvedValue(mockJobRole1);
+
+		const result = await jobRoleService.deleteJobRole(1);
+
+		expect(result).toBe(true);
+		expect(vi.mocked(prisma).jobRole.delete).toHaveBeenCalledWith({
+			where: { jobRoleId: 1 },
+		});
+	});
+
+	it("returns false when the job role does not exist", async () => {
+		vi.mocked(prisma).jobRole.findUnique = vi.fn().mockResolvedValue(null);
+
+		const result = await jobRoleService.deleteJobRole(999);
+
+		expect(result).toBe(false);
+		expect(vi.mocked(prisma).jobRole.delete).not.toHaveBeenCalled();
 	});
 });
 

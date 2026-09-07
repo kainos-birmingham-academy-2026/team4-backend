@@ -246,4 +246,17 @@ export class JobRoleService {
 
 		return this.jobRoleMapper.mapJobRoleToDetailedResponse(jobRole);
 	}
+
+	async deleteJobRole(id: number): Promise<boolean> {
+		const existingJobRole = await prisma.jobRole.findUnique({
+			where: { jobRoleId: id },
+		});
+
+		if (!existingJobRole) {
+			return false;
+		}
+
+		await prisma.jobRole.delete({ where: { jobRoleId: id } });
+		return true;
+	}
 }

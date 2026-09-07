@@ -11,6 +11,11 @@ export class JobRoleController {
 		private readonly jobRoleService: JobRoleService = new JobRoleService(),
 	) {}
 
+	private sendInternalServerError(res: Response, error: unknown): void {
+		const errorMessage = error instanceof Error ? `: ${error.message}` : "";
+		res.status(500).json({ error: `Internal server error${errorMessage}` });
+	}
+
 	async getAllJobRoles(_req: Request, res: Response): Promise<void> {
 		try {
 			const { page, sortBy, sortOrder, ...filters } = (res.locals
@@ -40,8 +45,8 @@ export class JobRoleController {
 					hasPrev,
 				},
 			});
-		} catch (_error) {
-			res.status(500).json({ error: "Internal server error" });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -49,17 +54,17 @@ export class JobRoleController {
 		try {
 			const options = await this.jobRoleService.findFilterOptions();
 			res.status(200).json(options);
-		} catch (_error) {
-			res.status(500).json({ error: "Internal server error" });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
 		}
 	}
 
-	async getCreateOptions(req: Request, res: Response): Promise<void> {
+	async getCreateOptions(_req: Request, res: Response): Promise<void> {
 		try {
 			const options = await this.jobRoleService.findCreateOptions();
 			res.status(200).json(options);
-		} catch (_error) {
-			res.status(500).json({ error: "Internal server error" });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -73,8 +78,8 @@ export class JobRoleController {
 				return;
 			}
 			res.status(200).json(jobRole);
-		} catch (_error) {
-			res.status(500).json({ error: "Internal server error" });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -95,7 +100,7 @@ export class JobRoleController {
 				return;
 			}
 
-			res.status(500).json({ error: "Internal server error" });
+			this.sendInternalServerError(res, error);
 		}
 	}
 
@@ -123,9 +128,23 @@ export class JobRoleController {
 				return;
 			}
 
-			res.status(500).json({ error: "Internal server error" });
+			this.sendInternalServerError(res, error);
 		}
 	}
 
-	async delete() {}
+	async delete(req: Request, res: Response): Promise<void> {
+		const id = Number(req.params.id);
+
+		try {
+			const deleted = await this.jobRoleService.deleteJobRole(id);
+			if (!deleted) {
+				res.status(404).json({ error: "Job role not found" });
+				return;
+			}
+
+			res.status(204).send();
+		} catch (error) {
+			this.sendInternalServerError(res, error);
+		}
+	}
 }

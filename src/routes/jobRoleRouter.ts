@@ -55,7 +55,11 @@ export const createJobRoleRouter = (
 		validateBody(JobRoleUpdateSchema),
 		controller.update.bind(controller),
 	);
-	router.delete("/:id", controller.delete.bind(controller));
+	router.delete(
+		"/:id",
+		validateParams(IdParamSchema),
+		controller.delete.bind(controller),
+	);
 
 	return router;
 };

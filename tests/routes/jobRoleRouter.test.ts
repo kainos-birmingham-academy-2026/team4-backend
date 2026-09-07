@@ -1,3 +1,4 @@
+import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -8,11 +9,7 @@ import { mockJobRoleResponse1, mockJobRoleResponses } from "../mockJobRoles";
 vi.mock("../../src/services/jobRoleService");
 vi.mock("../../src/middlewares/requireAuth", () => ({
 	requireAuth: vi.fn((_requireAdmin?: boolean) => {
-		return (
-			_req: express.Request,
-			_res: express.Response,
-			next: express.NextFunction,
-		) => {
+		return (_req: Request, _res: Response, next: NextFunction) => {
 			next();
 		};
 	}),
@@ -21,6 +18,7 @@ vi.mock("../../src/middlewares/requireAuth", () => ({
 // Set JWT_SECRET for test environment
 process.env.JWT_SECRET = "test-secret";
 
+const _mockFindAllJobRoles = vi.fn().mockResolvedValue(mockJobRoleResponses);
 const mockFindPaginatedJobRoles = vi.fn().mockResolvedValue({
 	jobs: mockJobRoleResponses,
 	totalCount: mockJobRoleResponses.length,
@@ -95,7 +93,9 @@ describe("GET /api/job-roles/:id", async () => {
 		const response = await request(testApp).get(`/api/job-roles/1`);
 
 		expect(response.status).toBe(500);
-		expect(response.body).toEqual({ error: "Internal server error" });
+		expect(response.body).toEqual({
+			error: "Internal server error: Service error",
+		});
 	});
 
 	it("should return status 400 when the id is not a number", async () => {
@@ -145,7 +145,9 @@ describe("GET /api/job-roles/create-options", () => {
 		);
 
 		expect(response.status).toBe(500);
-		expect(response.body).toEqual({ error: "Internal server error" });
+		expect(response.body).toEqual({
+			error: "Internal server error: Database error",
+		});
 	});
 });
 
@@ -231,7 +233,9 @@ describe("POST /api/job-roles", () => {
 			.send(createJobRolePayload);
 
 		expect(response.status).toBe(500);
-		expect(response.body).toEqual({ error: "Internal server error" });
+		expect(response.body).toEqual({
+			error: "Internal server error: Database error",
+		});
 	});
 });
 
@@ -280,5 +284,37 @@ describe("PUT /api/job-roles/:id", () => {
 
 		expect(response.status).toBe(404);
 		expect(response.body).toEqual({ error: "Job role not found" });
+	});
+});
+
+describe("DELETE /api/job-roles/:id", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("deletes a job role with status 204", async () => {
+		mockService.deleteJobRole = vi.fn().mockResolvedValue(true);
+
+		const response = await request(testApp).delete("/api/job-roles/1");
+
+		expect(response.status).toBe(204);
+		expect(mockService.deleteJobRole).toHaveBeenCalledWith(1);
+	});
+
+	it("returns 404 when the job role does not exist", async () => {
+		mockService.deleteJobRole = vi.fn().mockResolvedValue(false);
+
+		const response = await request(testApp).delete("/api/job-roles/999");
+
+		expect(response.status).toBe(404);
+		expect(response.body).toEqual({ error: "Job role not found" });
+	});
+
+	it("returns 400 when the id is invalid", async () => {
+		const response = await request(testApp).delete("/api/job-roles/abc");
+
+		expect(response.status).toBe(400);
+		expect(response.body.errors).toBeDefined();
+		expect(mockService.deleteJobRole).not.toHaveBeenCalled();
 	});
 });
