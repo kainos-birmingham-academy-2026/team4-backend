@@ -60,4 +60,34 @@ export class ApplicationController {
 			res.status(500).json({ error: "Internal server error" });
 		}
 	}
+
+	async getApplicationsByJobRole(req: Request, res: Response): Promise<void> {
+		try {
+			const applications =
+				await this.applicationService.findApplicationsByJobRoleId(
+					Number(req.params.jobRoleId),
+				);
+			res.status(200).json({ applications });
+		} catch (_error) {
+			res.status(500).json({ error: "Internal server error" });
+		}
+	}
+
+	async assessApplication(req: Request, res: Response): Promise<void> {
+		const targetStatus = req.params.action === "hire" ? "Hired" : "Rejected";
+
+		try {
+			const application = await this.applicationService.updateApplicationStatus(
+				Number(req.params.applicationId),
+				targetStatus,
+			);
+			res.status(200).json(application);
+		} catch (error) {
+			if (error instanceof ApplicationError) {
+				res.status(error.statusCode).json({ error: error.message });
+				return;
+			}
+			res.status(500).json({ error: "Internal server error" });
+		}
+	}
 }

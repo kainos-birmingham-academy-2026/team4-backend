@@ -40,7 +40,7 @@ async function main() {
 		"Executive",
 	];
 
-	const statuses = ["Open", "Closed", "In Progress"];
+	const statuses = ["Open", "Closed", "In Progress", "Hired", "Rejected"];
 
 	const passwordHash = await argon2.hash("Password123!");
 	const adminPasswordHash = await argon2.hash("AdminPassword123!");
