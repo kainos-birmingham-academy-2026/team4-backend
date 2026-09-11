@@ -19,6 +19,8 @@ const mockResponse = {
 const mockApplicationService = {
 	createApplication: vi.fn(),
 	findApplicationsByUserId: vi.fn(),
+	findApplicationsByJobRoleId: vi.fn(),
+	updateApplicationStatus: vi.fn(),
 } as unknown as ApplicationService;
 
 describe("ApplicationController - createApplication", () => {
@@ -155,5 +157,64 @@ describe("ApplicationController - getMyApplications", () => {
 		expect(
 			mockApplicationService.findApplicationsByUserId,
 		).not.toHaveBeenCalled();
+	});
+});
+
+describe("ApplicationController - assessment", () => {
+	let controller: ApplicationController;
+
+	beforeEach(() => {
+		controller = new ApplicationController(mockApplicationService);
+		vi.clearAllMocks();
+		mockRequest.params = { jobRoleId: "1", applicationId: "10" };
+	});
+
+	it("returns applications for a job role", async () => {
+		const applications = [{ applicationId: 10, status: "In Progress" }];
+		mockApplicationService.findApplicationsByJobRoleId = vi
+			.fn()
+			.mockResolvedValue(applications);
+
+		await controller.getApplicationsByJobRole(mockRequest, mockResponse);
+
+		expect(
+			mockApplicationService.findApplicationsByJobRoleId,
+		).toHaveBeenCalledWith(1);
+		expect(mockResponse.status).toHaveBeenCalledWith(200);
+		expect(mockResponse.json).toHaveBeenCalledWith({ applications });
+	});
+
+	it("maps the hire action to the Hired status", async () => {
+		const hired = { applicationId: 10, status: "Hired" };
+		mockRequest.params = { applicationId: "10", action: "hire" };
+		mockApplicationService.updateApplicationStatus = vi
+			.fn()
+			.mockResolvedValue(hired);
+
+		await controller.assessApplication(mockRequest, mockResponse);
+
+		expect(mockApplicationService.updateApplicationStatus).toHaveBeenCalledWith(
+			10,
+			"Hired",
+		);
+		expect(mockResponse.status).toHaveBeenCalledWith(200);
+		expect(mockResponse.json).toHaveBeenCalledWith(hired);
+	});
+
+	it("maps the reject action to the Rejected status", async () => {
+		const rejected = { applicationId: 10, status: "Rejected" };
+		mockRequest.params = { applicationId: "10", action: "reject" };
+		mockApplicationService.updateApplicationStatus = vi
+			.fn()
+			.mockResolvedValue(rejected);
+
+		await controller.assessApplication(mockRequest, mockResponse);
+
+		expect(mockApplicationService.updateApplicationStatus).toHaveBeenCalledWith(
+			10,
+			"Rejected",
+		);
+		expect(mockResponse.status).toHaveBeenCalledWith(200);
+		expect(mockResponse.json).toHaveBeenCalledWith(rejected);
 	});
 });

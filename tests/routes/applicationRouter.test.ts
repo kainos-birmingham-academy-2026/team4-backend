@@ -103,3 +103,60 @@ describe("GET /api/applications", () => {
 		expect(mockService.findApplicationsByUserId).toHaveBeenCalledWith(5);
 	});
 });
+
+describe("GET /api/applications/job-role/:jobRoleId", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("returns applications for a job role", async () => {
+		const applications = [{ applicationId: 10, status: "In Progress" }];
+		mockService.findApplicationsByJobRoleId = vi
+			.fn()
+			.mockResolvedValue(applications);
+
+		const response = await request(testApp).get("/api/applications/job-role/1");
+
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({ applications });
+		expect(mockService.findApplicationsByJobRoleId).toHaveBeenCalledWith(1);
+	});
+
+	it("rejects an invalid job role ID", async () => {
+		const response = await request(testApp).get(
+			"/api/applications/job-role/not-a-number",
+		);
+
+		expect(response.status).toBe(400);
+		expect(response.body.errors).toBeDefined();
+	});
+});
+
+describe("POST /api/applications/:applicationId/:action", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("hires an application", async () => {
+		const hired = { applicationId: 10, status: "Hired" };
+		mockService.updateApplicationStatus = vi.fn().mockResolvedValue(hired);
+
+		const response = await request(testApp).post("/api/applications/10/hire");
+
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual(hired);
+		expect(mockService.updateApplicationStatus).toHaveBeenCalledWith(
+			10,
+			"Hired",
+		);
+	});
+
+	it("rejects an unsupported assessment action", async () => {
+		const response = await request(testApp).post(
+			"/api/applications/10/shortlist",
+		);
+
+		expect(response.status).toBe(400);
+		expect(response.body.errors).toBeDefined();
+	});
+});

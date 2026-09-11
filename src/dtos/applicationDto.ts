@@ -16,3 +16,15 @@ export class ApplicationResponse {
 		public readonly createdAt: Date,
 	) {}
 }
+
+export class ApplicationAssessmentResponse {
+	constructor(
+		public readonly applicationId: number,
+		public readonly userId: number,
+		public readonly applicantEmail: string,
+		public readonly jobRoleId: number,
+		public readonly message: string,
+		public readonly status: string,
+		public readonly createdAt: Date,
+	) {}
+}

@@ -12,6 +12,7 @@ vi.mock("../../src/prismaClient", () => ({
 		jobRole: { findUnique: vi.fn() },
 		status: { findUnique: vi.fn() },
 		application: { create: vi.fn(), findMany: vi.fn() },
+		$transaction: vi.fn(),
 	},
 }));
 
@@ -36,6 +37,21 @@ const savedApplication = {
 	message: "I am interested.",
 	statusId: 3,
 	createdAt: new Date("2026-09-03T12:00:00.000Z"),
+};
+
+const assessmentApplication = {
+	...savedApplication,
+	status: inProgress,
+	user: { email: "applicant@example.com" },
+};
+
+const transactionClient = {
+	application: {
+		findUnique: vi.fn(),
+		update: vi.fn(),
+	},
+	status: { findUnique: vi.fn() },
+	jobRole: { updateMany: vi.fn() },
 };
 
 describe("ApplicationService", () => {
@@ -100,5 +116,121 @@ describe("ApplicationService", () => {
 			statusCode: 409,
 			message: "You have already applied for this job role",
 		});
+	});
+
+	it("lists applications for a job role with applicant details", async () => {
+		vi.mocked(prisma.application.findMany).mockResolvedValue([
+			assessmentApplication,
+		] as never);
+
+		const result = await service.findApplicationsByJobRoleId(1);
+
+		expect(prisma.application.findMany).toHaveBeenCalledWith({
+			where: { jobRoleId: 1 },
+			include: { status: true, user: { select: { email: true } } },
+			orderBy: { createdAt: "asc" },
+		});
+		expect(result).toEqual([
+			expect.objectContaining({
+				applicationId: 10,
+				applicantEmail: "applicant@example.com",
+				message: "I am interested.",
+				status: "In Progress",
+			}),
+		]);
+	});
+
+	it("hires an application and decrements an open position", async () => {
+		vi.mocked(prisma.$transaction).mockImplementation(async (callback) =>
+			callback(transactionClient as never),
+		);
+		transactionClient.application.findUnique.mockResolvedValue(
+			assessmentApplication as never,
+		);
+		transactionClient.status.findUnique.mockResolvedValue({
+			statusId: 4,
+			statusName: "Hired",
+		} as never);
+		transactionClient.jobRole.updateMany.mockResolvedValue({ count: 1 });
+		transactionClient.application.update.mockResolvedValue({
+			...savedApplication,
+			statusId: 4,
+			user: { email: "applicant@example.com" },
+		} as never);
+
+		const result = await service.updateApplicationStatus(10, "Hired");
+
+		expect(transactionClient.jobRole.updateMany).toHaveBeenCalledWith({
+			where: { jobRoleId: 1, numberOfOpenPositions: { gt: 0 } },
+			data: { numberOfOpenPositions: { decrement: 1 } },
+		});
+		expect(transactionClient.application.update).toHaveBeenCalledWith({
+			where: { applicationId: 10 },
+			data: { statusId: 4 },
+			include: { user: { select: { email: true } } },
+		});
+		expect(result.status).toBe("Hired");
+	});
+
+	it("rejects an application without changing open positions", async () => {
+		vi.mocked(prisma.$transaction).mockImplementation(async (callback) =>
+			callback(transactionClient as never),
+		);
+		transactionClient.application.findUnique.mockResolvedValue(
+			assessmentApplication as never,
+		);
+		transactionClient.status.findUnique.mockResolvedValue({
+			statusId: 5,
+			statusName: "Rejected",
+		} as never);
+		transactionClient.application.update.mockResolvedValue({
+			...savedApplication,
+			statusId: 5,
+			user: { email: "applicant@example.com" },
+		} as never);
+
+		const result = await service.updateApplicationStatus(10, "Rejected");
+
+		expect(transactionClient.jobRole.updateMany).not.toHaveBeenCalled();
+		expect(result.status).toBe("Rejected");
+	});
+
+	it("does not assess an application that is no longer in progress", async () => {
+		vi.mocked(prisma.$transaction).mockImplementation(async (callback) =>
+			callback(transactionClient as never),
+		);
+		transactionClient.application.findUnique.mockResolvedValue({
+			...assessmentApplication,
+			status: { statusId: 4, statusName: "Hired" },
+		} as never);
+
+		await expect(
+			service.updateApplicationStatus(10, "Rejected"),
+		).rejects.toMatchObject({
+			statusCode: 409,
+			message: "Only applications in progress can be assessed",
+		});
+	});
+
+	it("does not hire when no open positions remain", async () => {
+		vi.mocked(prisma.$transaction).mockImplementation(async (callback) =>
+			callback(transactionClient as never),
+		);
+		transactionClient.application.findUnique.mockResolvedValue(
+			assessmentApplication as never,
+		);
+		transactionClient.status.findUnique.mockResolvedValue({
+			statusId: 4,
+			statusName: "Hired",
+		} as never);
+		transactionClient.jobRole.updateMany.mockResolvedValue({ count: 0 });
+
+		await expect(
+			service.updateApplicationStatus(10, "Hired"),
+		).rejects.toMatchObject({
+			statusCode: 409,
+			message: "There are no open positions remaining for this role",
+		});
+		expect(transactionClient.application.update).not.toHaveBeenCalled();
 	});
 });

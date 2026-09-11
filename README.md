@@ -47,13 +47,32 @@ npm run prepare
 ```
 
 ## API
-* `http://localhost:4000/health` should display the current time. 
-* `http://localhost:4000/api/job-roles` should return a JSON object containing a list of open job roles.
-* `http://localhost:4000/api/job-roles/:id` should return a JSON object detailing a specific job role.
-* `http://localhost:4000/api/job-roles/filter-options` should return a JSON object containing a list of filters to filter the job roles.
-* `http://localhost:4000/api/applications` handles job applications from applicant users.
-* `http://localhost:4000/auth/login` handles login requests.
-* `http://localhost:4000/auth/register` handles registration requests.
+
+### Job roles
+* `GET /api/job-roles` returns a paginated JSON object containing a list of job roles, with optional filtering and sorting.
+* `GET /api/job-roles/filter-options` returns a JSON object containing the available filters for job roles.
+* `GET /api/job-roles/create-options` returns the capability, band, and status options for creating a job role. Requires an Admin token.
+* `GET /api/job-roles/:id` returns a JSON object detailing a specific job role.
+* `POST /api/job-roles` creates a new job role. Requires an Admin token.
+* `PUT /api/job-roles/:id` updates an existing job role. Requires an Admin token.
+* `DELETE /api/job-roles/:id` deletes a job role. Requires an Admin token.
+
+### Applications
+* `GET /api/applications` returns the applications submitted by the current authenticated user.
+* `POST /api/applications` submits a job application for the current authenticated user.
+* `GET /api/applications/job-role/:jobRoleId` returns the applications submitted for a job role, including applicant email and message. Requires an Admin token.
+* `POST /api/applications/:applicationId/hire` marks an in-progress application as hired and reduces the role's open positions by one. Requires an Admin token.
+* `POST /api/applications/:applicationId/reject` marks an in-progress application as rejected. Requires an Admin token.
+
+### Chat
+* `POST /api/chat` sends a message to the careers chat assistant and returns a response.
+
+### Auth
+* `POST /auth/login` handles login requests.
+* `POST /auth/register` handles registration requests.
+
+### Health
+* `GET /health` displays the current server status and time.
 
 A client must be logged in to send requests to the job role pages. To log in:
 1. Send a POST request to `/auth/login` with this body:
@@ -65,7 +84,7 @@ A client must be logged in to send requests to the job role pages. To log in:
 ```
 
 If you want to use an admin account, use these credentials:
-```
+```JSON
 {
    "email": "admin@example.com"
    "password": "AdminPassword123!"
