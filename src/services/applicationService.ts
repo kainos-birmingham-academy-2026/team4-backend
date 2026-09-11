@@ -64,6 +64,7 @@ export class ApplicationService {
 
 			return this.applicationMapper.mapApplicationToResponse(
 				application,
+				jobRole.roleName,
 				inProgressStatus.statusName,
 			);
 		} catch (error) {
@@ -88,13 +89,17 @@ export class ApplicationService {
 	): Promise<ApplicationResponse[]> {
 		const applications = await prisma.application.findMany({
 			where: { userId },
-			include: { status: true },
+			include: {
+				status: true,
+				jobRole: { select: { roleName: true } },
+			},
 			orderBy: { createdAt: "desc" },
 		});
 
 		return applications.map((application) =>
 			this.applicationMapper.mapApplicationToResponse(
 				application,
+				application.jobRole.roleName,
 				application.status.statusName,
 			),
 		);
