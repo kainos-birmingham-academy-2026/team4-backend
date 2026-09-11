@@ -58,8 +58,8 @@ npm run prepare
 * `DELETE /api/job-roles/:id` deletes a job role. Requires an Admin token.
 
 ### Applications
-* `GET /api/applications` returns the applications submitted by the current authenticated user.
-* `POST /api/applications` submits a job application for the current authenticated user.
+* `GET /api/applications` returns the applications submitted by the current authenticated user. Each application includes `applicationId`, `userId`, `jobRoleId`, `roleName`, `status`, and `createdAt`. Requires a user token.
+* `POST /api/applications` submits a job application for the current authenticated user. Requires a user token.
 * `GET /api/applications/job-role/:jobRoleId` returns the applications submitted for a job role, including applicant email and message. Requires an Admin token.
 * `POST /api/applications/:applicationId/hire` marks an in-progress application as hired and reduces the role's open positions by one. Requires an Admin token.
 * `POST /api/applications/:applicationId/reject` marks an in-progress application as rejected. Requires an Admin token.
