@@ -151,7 +151,7 @@ docker compose down -v
 
 The `-v` flag removes volumes (including the database), allowing you to run `docker compose up --build -d` again for a completely fresh environment.
 
-#1. Ensure PostgreSQL is running locally
+1. Ensure PostgreSQL is running locally
 2. Create a `.env` file in the root:
    ```bash
    DATABASE_URL="postgresql://postgres:password@localhost:5432/jobRoles"
