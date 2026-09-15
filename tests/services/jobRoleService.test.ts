@@ -65,6 +65,9 @@ describe("JobRoleService - findAllJobRoles", () => {
 		const result = await jobRoleService.findAllJobRoles();
 
 		expect(result).toEqual(mockJobRoleResponses);
+		expect(vi.mocked(prisma).jobRole.findMany).toHaveBeenCalledWith({
+			orderBy: { jobRoleId: "asc" },
+		});
 		expect(mapJobRoleToResponseMock).toHaveBeenCalledTimes(mockJobRoles.length);
 	});
 });

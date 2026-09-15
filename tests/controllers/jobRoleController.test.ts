@@ -12,6 +12,7 @@ const mockRequest = {
 
 const mockResponse = {
 	status: vi.fn().mockReturnThis(),
+	setHeader: vi.fn().mockReturnThis(),
 	json: vi.fn(),
 	send: vi.fn(),
 	locals: {} as Record<string, unknown>,
@@ -19,6 +20,7 @@ const mockResponse = {
 
 const mockJobRoleService = {
 	findAllJobRoles: vi.fn(),
+	findAllDetailedJobRoles: vi.fn(),
 	findJobRoleById: vi.fn(),
 	findPaginatedJobRoles: vi.fn(),
 } as unknown as JobRoleService;
@@ -166,6 +168,54 @@ describe("JobRoleController - getAllJobRoles", async () => {
 			{ roleName: "engineer" },
 			{ sortBy: "roleName", sortOrder: "desc" },
 		);
+	});
+});
+
+describe("JobRoleController - exportJobRoles", () => {
+	let jobRoleController: JobRoleController;
+
+	beforeEach(() => {
+		jobRoleController = new JobRoleController(mockJobRoleService);
+		vi.clearAllMocks();
+	});
+
+	it("returns all job role details as a downloadable CSV", async () => {
+		mockJobRoleService.findAllDetailedJobRoles = vi.fn().mockResolvedValue([
+			{
+				...mockJobRole1,
+				capability: "Engineering",
+				band: "Band 1",
+				status: "Open",
+			},
+		]);
+
+		await jobRoleController.exportJobRoles(mockRequest, mockResponse);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(200);
+		expect(mockResponse.setHeader).toHaveBeenCalledWith(
+			"Content-Type",
+			"text/csv; charset=utf-8",
+		);
+		expect(mockResponse.setHeader).toHaveBeenCalledWith(
+			"Content-Disposition",
+			'attachment; filename="job-roles.csv"',
+		);
+		expect(mockResponse.send).toHaveBeenCalledWith(
+			"jobRoleId,roleName,location,capability,band,closingDate,status,description,responsibilities,sharepointUrl,numberOfOpenPositions\r\n1,Software Engineer,Remote,Engineering,Band 1,2024-12-31T00:00:00.000Z,Open,Develop and maintain software applications.,Write code; Review code; Deploy applications,https://sharepoint.example.com/jobroles/1,3\r\n",
+		);
+	});
+
+	it("returns status 500 when export generation fails", async () => {
+		mockJobRoleService.findAllDetailedJobRoles = vi
+			.fn()
+			.mockRejectedValue(new Error("Service error"));
+
+		await jobRoleController.exportJobRoles(mockRequest, mockResponse);
+
+		expect(mockResponse.status).toHaveBeenCalledWith(500);
+		expect(mockResponse.json).toHaveBeenCalledWith({
+			error: "Internal server error: Service error",
+		});
 	});
 });
 

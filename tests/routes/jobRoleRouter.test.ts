@@ -4,7 +4,11 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createJobRoleRouter } from "../../src/routes/jobRoleRouter";
 import { JobRoleService } from "../../src/services/jobRoleService";
-import { mockJobRoleResponse1, mockJobRoleResponses } from "../mockJobRoles";
+import {
+	mockJobRoleDetailedResponses,
+	mockJobRoleResponse1,
+	mockJobRoleResponses,
+} from "../mockJobRoles";
 
 vi.mock("../../src/services/jobRoleService");
 vi.mock("../../src/middlewares/requireAuth", () => ({
@@ -18,7 +22,9 @@ vi.mock("../../src/middlewares/requireAuth", () => ({
 // Set JWT_SECRET for test environment
 process.env.JWT_SECRET = "test-secret";
 
-const _mockFindAllJobRoles = vi.fn().mockResolvedValue(mockJobRoleResponses);
+const mockFindAllDetailedJobRoles = vi
+	.fn()
+	.mockResolvedValue(mockJobRoleDetailedResponses);
 const mockFindPaginatedJobRoles = vi.fn().mockResolvedValue({
 	jobs: mockJobRoleResponses,
 	totalCount: mockJobRoleResponses.length,
@@ -54,6 +60,24 @@ describe("GET /api/job-roles", async () => {
 		expect(response.status).toBe(200);
 		expect(response.body.jobs).toEqual(
 			JSON.parse(JSON.stringify(mockJobRoleResponses)),
+		);
+	});
+});
+
+describe("GET /api/job-roles/export", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("returns a CSV export", async () => {
+		mockService.findAllDetailedJobRoles = mockFindAllDetailedJobRoles;
+
+		const response = await request(testApp).get("/api/job-roles/export");
+
+		expect(response.status).toBe(200);
+		expect(response.headers["content-type"]).toContain("text/csv");
+		expect(response.headers["content-disposition"]).toBe(
+			'attachment; filename="job-roles.csv"',
 		);
 	});
 });

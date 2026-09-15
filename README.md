@@ -50,6 +50,7 @@ npm run prepare
 
 ### Job roles
 * `GET /api/job-roles` returns a paginated JSON object containing a list of job roles, with optional filtering and sorting.
+* `GET /api/job-roles/export` downloads a CSV report containing all job role information. Requires an Admin token.
 * `GET /api/job-roles/filter-options` returns a JSON object containing the available filters for job roles.
 * `GET /api/job-roles/create-options` returns the capability, band, and status options for creating a job role. Requires an Admin token.
 * `GET /api/job-roles/:id` returns a JSON object detailing a specific job role.

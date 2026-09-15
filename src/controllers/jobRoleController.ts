@@ -1,10 +1,52 @@
 import type { Request, Response } from "express";
 import type {
 	JobRoleCreateInput,
+	JobRoleDetailedResponse,
 	JobRoleQuery,
 	JobRoleUpdateInput,
 } from "../dtos/jobRoleDto.js";
 import { JobRoleService } from "../services/jobRoleService.js";
+
+const csvHeaders = [
+	"jobRoleId",
+	"roleName",
+	"location",
+	"capability",
+	"band",
+	"closingDate",
+	"status",
+	"description",
+	"responsibilities",
+	"sharepointUrl",
+	"numberOfOpenPositions",
+];
+
+const escapeCsvValue = (value: unknown): string => {
+	const stringValue =
+		value instanceof Date ? value.toISOString() : String(value ?? "");
+	return /[",\r\n]/.test(stringValue)
+		? `"${stringValue.replace(/"/g, '""')}"`
+		: stringValue;
+};
+
+const jobRoleToCsvRow = (jobRole: JobRoleDetailedResponse): string[] => [
+	escapeCsvValue(jobRole.jobRoleId),
+	escapeCsvValue(jobRole.roleName),
+	escapeCsvValue(jobRole.location),
+	escapeCsvValue(jobRole.capability),
+	escapeCsvValue(jobRole.band),
+	escapeCsvValue(jobRole.closingDate),
+	escapeCsvValue(jobRole.status),
+	escapeCsvValue(jobRole.description),
+	escapeCsvValue(jobRole.responsibilities.join("; ")),
+	escapeCsvValue(jobRole.sharepointUrl),
+	escapeCsvValue(jobRole.numberOfOpenPositions),
+];
+
+const jobRolesToCsv = (jobRoles: JobRoleDetailedResponse[]): string =>
+	`${[csvHeaders, ...jobRoles.map(jobRoleToCsvRow)]
+		.map((row) => row.join(","))
+		.join("\r\n")}\r\n`;
 
 export class JobRoleController {
 	constructor(
@@ -45,6 +87,22 @@ export class JobRoleController {
 					hasPrev,
 				},
 			});
+		} catch (error) {
+			this.sendInternalServerError(res, error);
+		}
+	}
+
+	async exportJobRoles(_req: Request, res: Response): Promise<void> {
+		try {
+			const jobRoles = await this.jobRoleService.findAllDetailedJobRoles();
+			res
+				.status(200)
+				.setHeader("Content-Type", "text/csv; charset=utf-8")
+				.setHeader(
+					"Content-Disposition",
+					'attachment; filename="job-roles.csv"',
+				)
+				.send(jobRolesToCsv(jobRoles));
 		} catch (error) {
 			this.sendInternalServerError(res, error);
 		}
