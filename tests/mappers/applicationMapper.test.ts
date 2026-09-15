@@ -16,6 +16,7 @@ describe("ApplicationMapper", () => {
 				statusId: 3,
 				createdAt,
 			},
+			"Software Engineer",
 			"In Progress",
 		);
 
@@ -23,6 +24,7 @@ describe("ApplicationMapper", () => {
 			applicationId: 1,
 			userId: 4,
 			jobRoleId: 8,
+			roleName: "Software Engineer",
 			status: "In Progress",
 			createdAt,
 		});

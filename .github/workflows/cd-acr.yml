@@ -65,7 +65,11 @@ jobs:
           while IFS= read -r tag; do
             docker push "$tag"
           done <<< "${{ steps.meta.outputs.tags }}"
-
+      
+      - name: Show pushed tags
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: echo "$TAGS"
 
   terraform:
     name: Terraform apply

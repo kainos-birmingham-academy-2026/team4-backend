@@ -39,6 +39,12 @@ const savedApplication = {
 	createdAt: new Date("2026-09-03T12:00:00.000Z"),
 };
 
+const userApplication = {
+	...savedApplication,
+	status: inProgress,
+	jobRole: { roleName: "Software Engineer" },
+};
+
 const assessmentApplication = {
 	...savedApplication,
 	status: inProgress,
@@ -137,6 +143,30 @@ describe("ApplicationService", () => {
 				message: "I am interested.",
 				status: "In Progress",
 			}),
+		]);
+	});
+
+	it("lists the current user's applications with role names", async () => {
+		vi.mocked(prisma.application.findMany).mockResolvedValue([
+			userApplication,
+		] as never);
+		mapResponse.mockImplementation((_application, roleName, statusName) => ({
+			roleName,
+			status: statusName,
+		}));
+
+		const result = await service.findApplicationsByUserId(5);
+
+		expect(prisma.application.findMany).toHaveBeenCalledWith({
+			where: { userId: 5 },
+			include: {
+				status: true,
+				jobRole: { select: { roleName: true } },
+			},
+			orderBy: { createdAt: "desc" },
+		});
+		expect(result).toEqual([
+			{ roleName: "Software Engineer", status: "In Progress" },
 		]);
 	});
 

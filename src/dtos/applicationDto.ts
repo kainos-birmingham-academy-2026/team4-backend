@@ -12,6 +12,7 @@ export class ApplicationResponse {
 		public readonly applicationId: number,
 		public readonly userId: number,
 		public readonly jobRoleId: number,
+		public readonly roleName: string,
 		public readonly status: string,
 		public readonly createdAt: Date,
 	) {}
