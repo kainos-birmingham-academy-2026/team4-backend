@@ -26,6 +26,7 @@ jobs:
           context: .
           file: .dockerfile
           push: false
+          load: true
           tags: team4-backend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
