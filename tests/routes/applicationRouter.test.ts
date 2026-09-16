@@ -2,6 +2,7 @@ import express from "express";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApplicationRouter } from "../../src/routes/applicationRouter";
+import { ApplicationFitService } from "../../src/services/applicationFitService";
 import { ApplicationService } from "../../src/services/applicationService";
 
 vi.mock("../../src/services/applicationService");
@@ -25,10 +26,14 @@ vi.mock("../../src/middlewares/requireAuth", () => ({
 process.env.JWT_SECRET = "test-secret";
 
 const mockService = new (vi.mocked(ApplicationService))();
+const mockFitService = new (vi.mocked(ApplicationFitService))();
 
 const testApp = express();
 testApp.use(express.json());
-testApp.use("/api/applications", createApplicationRouter(mockService));
+testApp.use(
+	"/api/applications",
+	createApplicationRouter(mockService, mockFitService),
+);
 
 describe("POST /api/applications", () => {
 	beforeEach(() => {
@@ -154,6 +159,42 @@ describe("POST /api/applications/:applicationId/:action", () => {
 	it("rejects an unsupported assessment action", async () => {
 		const response = await request(testApp).post(
 			"/api/applications/10/shortlist",
+		);
+
+		expect(response.status).toBe(400);
+		expect(response.body.errors).toBeDefined();
+	});
+});
+
+describe("POST /api/applications/job-role/:jobRoleId/fit-assessments", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("assesses incomplete applications for a job role", async () => {
+		const result = {
+			processed: 2,
+			completed: 2,
+			unavailable: 0,
+			failed: 0,
+			skippedComplete: 1,
+		};
+		mockFitService.assessApplicationsForJobRole = vi
+			.fn()
+			.mockResolvedValue(result);
+
+		const response = await request(testApp).post(
+			"/api/applications/job-role/1/fit-assessments",
+		);
+
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual(result);
+		expect(mockFitService.assessApplicationsForJobRole).toHaveBeenCalledWith(1);
+	});
+
+	it("rejects an invalid job role ID", async () => {
+		const response = await request(testApp).post(
+			"/api/applications/job-role/not-a-number/fit-assessments",
 		);
 
 		expect(response.status).toBe(400);

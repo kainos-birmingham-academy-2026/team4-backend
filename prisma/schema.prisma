@@ -63,12 +63,20 @@ model User {
 }
 
 model Application {
-  applicationId Int      @id @default(autoincrement())
-  jobRoleId     Int
-  userId        Int
-  message       String
-  statusId      Int
-  createdAt     DateTime @default(now())
+  applicationId    Int      @id @default(autoincrement())
+  jobRoleId        Int
+  userId           Int
+  message          String
+  statusId         Int
+  createdAt        DateTime @default(now())
+  fitScore         Int?
+  fitSummary       String?
+  fitStrengths     String[] @default([])
+  fitGaps          String[] @default([])
+  fitStatus        String?
+  fitAssessedAt    DateTime?
+  fitModel         String?
+  fitPromptVersion String?
 
   jobRole JobRole @relation(fields: [jobRoleId], references: [jobRoleId])
   user    User    @relation(fields: [userId], references: [id])

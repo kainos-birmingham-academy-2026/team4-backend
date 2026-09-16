@@ -1,0 +1,9 @@
+ALTER TABLE "Application"
+ADD COLUMN "fitScore" INTEGER,
+ADD COLUMN "fitSummary" TEXT,
+ADD COLUMN "fitStrengths" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "fitGaps" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "fitStatus" TEXT,
+ADD COLUMN "fitAssessedAt" TIMESTAMP(3),
+ADD COLUMN "fitModel" TEXT,
+ADD COLUMN "fitPromptVersion" TEXT;

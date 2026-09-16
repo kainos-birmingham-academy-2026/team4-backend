@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ApplicationController } from "../../src/controllers/applicationController";
+import type { ApplicationFitService } from "../../src/services/applicationFitService";
 import {
 	ApplicationError,
 	type ApplicationService,
@@ -23,11 +24,18 @@ const mockApplicationService = {
 	updateApplicationStatus: vi.fn(),
 } as unknown as ApplicationService;
 
+const mockApplicationFitService = {
+	assessApplicationsForJobRole: vi.fn(),
+} as unknown as ApplicationFitService;
+
 describe("ApplicationController - createApplication", () => {
 	let controller: ApplicationController;
 
 	beforeEach(() => {
-		controller = new ApplicationController(mockApplicationService);
+		controller = new ApplicationController(
+			mockApplicationService,
+			mockApplicationFitService,
+		);
 		vi.clearAllMocks();
 		mockResponse.locals = {
 			authUser: { userId: 5, email: "user@example.com", role: "USER" },
@@ -164,7 +172,10 @@ describe("ApplicationController - assessment", () => {
 	let controller: ApplicationController;
 
 	beforeEach(() => {
-		controller = new ApplicationController(mockApplicationService);
+		controller = new ApplicationController(
+			mockApplicationService,
+			mockApplicationFitService,
+		);
 		vi.clearAllMocks();
 		mockRequest.params = { jobRoleId: "1", applicationId: "10" };
 	});
@@ -216,5 +227,27 @@ describe("ApplicationController - assessment", () => {
 		);
 		expect(mockResponse.status).toHaveBeenCalledWith(200);
 		expect(mockResponse.json).toHaveBeenCalledWith(rejected);
+	});
+
+	it("runs fit assessments for every eligible application on a job role", async () => {
+		mockRequest.params = { jobRoleId: "1" };
+		const result = {
+			processed: 2,
+			completed: 1,
+			unavailable: 1,
+			failed: 0,
+			skippedComplete: 3,
+		};
+		mockApplicationFitService.assessApplicationsForJobRole = vi
+			.fn()
+			.mockResolvedValue(result);
+
+		await controller.assessApplicationsForJobRole(mockRequest, mockResponse);
+
+		expect(
+			mockApplicationFitService.assessApplicationsForJobRole,
+		).toHaveBeenCalledWith(1);
+		expect(mockResponse.status).toHaveBeenCalledWith(200);
+		expect(mockResponse.json).toHaveBeenCalledWith(result);
 	});
 });

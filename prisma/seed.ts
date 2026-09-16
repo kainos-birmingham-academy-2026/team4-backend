@@ -734,6 +734,190 @@ async function main() {
 		],
 		skipDuplicates: true,
 	});
+
+	const demoApplications = [
+		{
+			roleName: "Graduate Software Engineer",
+			email: "ava.patel@example.com",
+			message:
+				"I recently completed a software engineering degree and built TypeScript web applications in agile team projects. I enjoy writing unit tests, reviewing pull requests, and learning from experienced engineers.",
+			fitScore: 92,
+			fitSummary:
+				"The application gives strong, specific evidence of software development, testing, teamwork, and a willingness to learn.",
+			fitStrengths: [
+				"TypeScript development",
+				"Unit testing",
+				"Agile teamwork",
+			],
+			fitGaps: ["No customer-site experience mentioned"],
+		},
+		{
+			roleName: "Graduate Software Engineer",
+			email: "ben.wilson@example.com",
+			message:
+				"I have completed introductory programming coursework in Java and Python. I am keen to start a career in software and have worked on group presentations at university.",
+			fitScore: 64,
+			fitSummary:
+				"The application indicates early programming experience and collaboration, but provides limited evidence of testing or delivering software components.",
+			fitStrengths: ["Programming foundations", "University group work"],
+			fitGaps: [
+				"Unit testing experience",
+				"Examples of completed software projects",
+			],
+		},
+		{
+			roleName: "Graduate Software Engineer",
+			email: "casey.morgan@example.com",
+			message:
+				"I am interested in moving into technology after working in retail. I enjoy helping customers and would like an opportunity to learn more about software development.",
+			fitScore: 31,
+			fitSummary:
+				"The application shows motivation to learn and customer-facing experience, but does not include specific evidence of software development or testing.",
+			fitStrengths: ["Interest in learning", "Customer communication"],
+			fitGaps: [
+				"Software development experience",
+				"Testing experience",
+				"Examples of technical teamwork",
+			],
+		},
+		{
+			roleName: "Senior Test Engineer",
+			email: "dylan.owens@example.com",
+			message:
+				"For the last four years I have created automated API and UI tests, maintained test plans, and worked with developers to investigate defects in agile delivery teams.",
+			fitScore: 91,
+			fitSummary:
+				"The application provides direct evidence of automated and manual testing, test planning, defect reporting, and agile collaboration.",
+			fitStrengths: [
+				"Automated API and UI testing",
+				"Test planning",
+				"Defect investigation",
+			],
+			fitGaps: ["No specific tooling named"],
+		},
+		{
+			roleName: "Senior Test Engineer",
+			email: "erin.kelly@example.com",
+			message:
+				"I have worked as a QA analyst on web projects, carrying out manual regression testing and documenting defects. I have started learning test automation in my own time.",
+			fitScore: 61,
+			fitSummary:
+				"The application shows relevant manual testing and defect-reporting experience, with emerging but unproven automated testing capability.",
+			fitStrengths: ["Manual regression testing", "Defect documentation"],
+			fitGaps: ["Demonstrated automated test delivery", "Test-plan ownership"],
+		},
+		{
+			roleName: "Senior Test Engineer",
+			email: "frankie.lee@example.com",
+			message:
+				"I have provided first-line customer support and recorded issues in a ticketing system. I would like to move into a quality assurance role.",
+			fitScore: 28,
+			fitSummary:
+				"The application demonstrates issue-recording experience and interest in quality assurance, but does not give evidence of designing or executing software tests.",
+			fitStrengths: ["Issue recording", "Customer support"],
+			fitGaps: ["Test execution", "Automated testing", "Test-case design"],
+		},
+		{
+			roleName: "Associate Platform Engineer",
+			email: "georgia.adams@example.com",
+			message:
+				"I have deployed containerised services to Azure, written CI/CD pipelines, and helped monitor production services. I enjoy collaborating with engineering and security colleagues.",
+			fitScore: 88,
+			fitSummary:
+				"The application gives strong evidence of cloud deployment, CI/CD, production support, and cross-functional collaboration.",
+			fitStrengths: [
+				"Azure deployments",
+				"CI/CD pipelines",
+				"Production service monitoring",
+			],
+			fitGaps: ["No specific scalability example mentioned"],
+		},
+		{
+			roleName: "Associate Platform Engineer",
+			email: "harper.scott@example.com",
+			message:
+				"During a placement I used Docker, GitHub Actions, and AWS training labs. I have worked on team projects and want to develop my cloud engineering skills.",
+			fitScore: 59,
+			fitSummary:
+				"The application shows relevant foundational platform tools and teamwork, but provides limited evidence of operating live services.",
+			fitStrengths: ["Docker", "CI/CD foundations", "Team projects"],
+			fitGaps: ["Live service support", "Security and reliability examples"],
+		},
+		{
+			roleName: "Associate Platform Engineer",
+			email: "jamie.taylor@example.com",
+			message:
+				"I have experience coordinating events and maintaining spreadsheets. I am interested in developing a career in technology and working with a team.",
+			fitScore: 25,
+			fitSummary:
+				"The application describes transferable coordination experience and interest in technology, but no specific evidence of platform engineering skills.",
+			fitStrengths: ["Coordination", "Interest in teamwork"],
+			fitGaps: ["Cloud technology", "Automation", "Service operation"],
+		},
+	];
+
+	const applicantEmails = demoApplications.map(
+		(application) => application.email,
+	);
+	await Promise.all(
+		applicantEmails.map((email) =>
+			prisma.user.upsert({
+				where: { email },
+				update: {},
+				create: { email, passwordHash },
+			}),
+		),
+	);
+
+	const roleNames = [
+		...new Set(demoApplications.map((application) => application.roleName)),
+	];
+	const [seededRoles, seededApplicants] = await Promise.all([
+		prisma.jobRole.findMany({
+			where: { roleName: { in: roleNames } },
+			select: { jobRoleId: true, roleName: true },
+		}),
+		prisma.user.findMany({
+			where: { email: { in: applicantEmails } },
+			select: { email: true, id: true },
+		}),
+	]);
+
+	const roleIds = new Map(
+		seededRoles.map((role) => [role.roleName, role.jobRoleId]),
+	);
+	const applicantIds = new Map(
+		seededApplicants.map((applicant) => [applicant.email, applicant.id]),
+	);
+	const assessedAt = new Date("2026-09-16T09:00:00.000Z");
+
+	await prisma.application.createMany({
+		data: demoApplications.map((application) => {
+			const jobRoleId = roleIds.get(application.roleName);
+			const userId = applicantIds.get(application.email);
+
+			if (!jobRoleId || !userId) {
+				throw new Error(
+					"Unable to create the demo fit assessment applications.",
+				);
+			}
+
+			return {
+				jobRoleId,
+				userId,
+				message: application.message,
+				statusId: statusMap["In Progress"],
+				fitScore: application.fitScore,
+				fitSummary: application.fitSummary,
+				fitStrengths: application.fitStrengths,
+				fitGaps: application.fitGaps,
+				fitStatus: "Complete",
+				fitAssessedAt: assessedAt,
+				fitModel: "gpt-5.4-nano",
+				fitPromptVersion: "v1",
+			};
+		}),
+	});
 }
 
 main().finally(() => prisma.$disconnect());

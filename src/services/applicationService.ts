@@ -124,6 +124,14 @@ export class ApplicationService {
 					application.message,
 					application.status.statusName,
 					application.createdAt,
+					application.fitScore,
+					application.fitSummary,
+					application.fitStrengths,
+					application.fitGaps,
+					application.fitStatus as "Complete" | "Unavailable" | "Failed" | null,
+					application.fitAssessedAt,
+					application.fitModel,
+					application.fitPromptVersion,
 				),
 		);
 	}
@@ -187,6 +195,18 @@ export class ApplicationService {
 				updatedApplication.message,
 				targetStatusName,
 				updatedApplication.createdAt,
+				updatedApplication.fitScore,
+				updatedApplication.fitSummary,
+				updatedApplication.fitStrengths,
+				updatedApplication.fitGaps,
+				updatedApplication.fitStatus as
+					| "Complete"
+					| "Unavailable"
+					| "Failed"
+					| null,
+				updatedApplication.fitAssessedAt,
+				updatedApplication.fitModel,
+				updatedApplication.fitPromptVersion,
 			);
 		});
 	}
