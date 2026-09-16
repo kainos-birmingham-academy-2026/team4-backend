@@ -14,11 +14,11 @@ const csvHeaders = [
 	"capability",
 	"band",
 	"closingDate",
-	"status",
 	"description",
 	"responsibilities",
 	"sharepointUrl",
 	"numberOfOpenPositions",
+	"status",
 ];
 
 const escapeCsvValue = (value: unknown): string => {
@@ -36,11 +36,11 @@ const jobRoleToCsvRow = (jobRole: JobRoleDetailedResponse): string[] => [
 	escapeCsvValue(jobRole.capability),
 	escapeCsvValue(jobRole.band),
 	escapeCsvValue(jobRole.closingDate),
-	escapeCsvValue(jobRole.status),
 	escapeCsvValue(jobRole.description),
 	escapeCsvValue(jobRole.responsibilities.join("; ")),
 	escapeCsvValue(jobRole.sharepointUrl),
 	escapeCsvValue(jobRole.numberOfOpenPositions),
+	escapeCsvValue(jobRole.status),
 ];
 
 const jobRolesToCsv = (jobRoles: JobRoleDetailedResponse[]): string =>

@@ -201,7 +201,7 @@ describe("JobRoleController - exportJobRoles", () => {
 			'attachment; filename="job-roles.csv"',
 		);
 		expect(mockResponse.send).toHaveBeenCalledWith(
-			"jobRoleId,roleName,location,capability,band,closingDate,status,description,responsibilities,sharepointUrl,numberOfOpenPositions\r\n1,Software Engineer,Remote,Engineering,Band 1,2024-12-31T00:00:00.000Z,Open,Develop and maintain software applications.,Write code; Review code; Deploy applications,https://sharepoint.example.com/jobroles/1,3\r\n",
+			"jobRoleId,roleName,location,capability,band,closingDate,description,responsibilities,sharepointUrl,numberOfOpenPositions,status\r\n1,Software Engineer,Remote,Engineering,Band 1,2024-12-31T00:00:00.000Z,Develop and maintain software applications.,Write code; Review code; Deploy applications,https://sharepoint.example.com/jobroles/1,3,Open\r\n",
 		);
 	});
 
