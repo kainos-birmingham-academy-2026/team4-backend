@@ -2,6 +2,7 @@ import { Router } from "express";
 import { JobRoleController } from "../controllers/jobRoleController.js";
 import {
 	IdParamSchema,
+	JobRoleComparisonQuerySchema,
 	JobRoleCreateSchema,
 	JobRoleFilterSchema,
 	JobRoleUpdateSchema,
@@ -30,6 +31,12 @@ export const createJobRoleRouter = (
 		controller.getAllJobRoles.bind(controller),
 	);
 	router.get("/filter-options", controller.getFilterOptions.bind(controller));
+	router.get("/career-matrix", controller.getCareerMatrix.bind(controller));
+	router.get(
+		"/compare",
+		validateQuery(JobRoleComparisonQuerySchema),
+		controller.compareJobRoles.bind(controller),
+	);
 	router.get(
 		"/create-options",
 		requireAuth(true),
