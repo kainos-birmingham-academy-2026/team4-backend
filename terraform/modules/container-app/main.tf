@@ -26,6 +26,12 @@ resource "azurerm_container_app" "this" {
     identity            = var.managed_identity_id
   }
 
+  secret {
+    name                = "job-role-status-secret-ref"
+    key_vault_secret_id = var.job_role_status_secret_id
+    identity            = var.managed_identity_id
+  }
+
   ingress {
     external_enabled = false
     target_port      = 4000
@@ -55,6 +61,11 @@ resource "azurerm_container_app" "this" {
       env {
         name        = "JWT_SECRET"
         secret_name = "jwt-secret-ref"
+      }
+
+      env {
+        name        = "JOB_ROLE_STATUS_UPDATE_SECRET"
+        secret_name = "job-role-status-secret-ref"
       }
 
       env {
