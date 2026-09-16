@@ -26,6 +26,13 @@ jobs:
           context: .
           file: .dockerfile
           push: false
+          load: true
           tags: team4-backend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Verify image was tagged
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          docker image inspect "team4-backend:${SHA}" --format 'built {{.Id}} ({{.Size}} bytes)'
+          docker image ls team4-backend

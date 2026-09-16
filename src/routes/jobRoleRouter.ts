@@ -29,6 +29,11 @@ export const createJobRoleRouter = (
 		validateQuery(JobRoleFilterSchema),
 		controller.getAllJobRoles.bind(controller),
 	);
+	router.get(
+		"/export",
+		requireAuth(true),
+		controller.exportJobRoles.bind(controller),
+	);
 	router.get("/filter-options", controller.getFilterOptions.bind(controller));
 	router.get(
 		"/create-options",

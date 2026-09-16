@@ -62,13 +62,26 @@ export class JobRoleService {
 	}
 
 	async findAllJobRoles(): Promise<JobRoleResponse[]> {
-		const jobRoles: JobRole[] = await prisma.jobRole.findMany();
+		const jobRoles: JobRole[] = await prisma.jobRole.findMany({
+			orderBy: { jobRoleId: "asc" },
+		});
 		const jobRoleResponses = await Promise.all(
 			jobRoles.map((jobRole) =>
 				this.jobRoleMapper.mapJobRoleToResponse(jobRole),
 			),
 		);
 		return jobRoleResponses;
+	}
+
+	async findAllDetailedJobRoles(): Promise<JobRoleDetailedResponse[]> {
+		const jobRoles: JobRole[] = await prisma.jobRole.findMany({
+			orderBy: { jobRoleId: "asc" },
+		});
+		return Promise.all(
+			jobRoles.map((jobRole) =>
+				this.jobRoleMapper.mapJobRoleToDetailedResponse(jobRole),
+			),
+		);
 	}
 
 	async findJobRoleById(id: number): Promise<JobRoleDetailedResponse | null> {
