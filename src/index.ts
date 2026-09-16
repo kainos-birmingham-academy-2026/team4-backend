@@ -1,8 +1,20 @@
 import "dotenv/config";
 import express from "express";
 import { app } from "./app.js";
+import prisma from "./prismaClient.js";
 
 const PORT = parseInt(process.env.PORT || "4000", 10);
+
+async function ensureApplicationStatuses(): Promise<void> {
+	for (const statusName of ["In Progress", "Hired", "Rejected"]) {
+		await prisma.status.upsert({
+			where: { statusName },
+			update: {},
+			create: { statusName },
+		});
+	}
+}
+
 // Middleware
 app.use(express.json());
 
@@ -16,8 +28,14 @@ app.get("/health", (_req, res) => {
 	res.json({ status: "UP", time: new Date().toISOString() });
 });
 
-// Start server
-app.listen(PORT, "0.0.0.0", () => {
-	console.log(`🚀 Server running on http://localhost:${PORT}`);
-	console.log(`📝 Try: http://localhost:${PORT}/health`);
-});
+ensureApplicationStatuses()
+	.then(() => {
+		app.listen(PORT, "0.0.0.0", () => {
+			console.log(`🚀 Server running on http://localhost:${PORT}`);
+			console.log(`📝 Try: http://localhost:${PORT}/health`);
+		});
+	})
+	.catch((error) => {
+		console.error("Failed to initialise application statuses", error);
+		process.exitCode = 1;
+	});
