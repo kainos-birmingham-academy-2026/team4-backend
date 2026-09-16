@@ -28,14 +28,11 @@ app.get("/health", (_req, res) => {
 	res.json({ status: "UP", time: new Date().toISOString() });
 });
 
-ensureApplicationStatuses()
-	.then(() => {
-		app.listen(PORT, "0.0.0.0", () => {
-			console.log(`🚀 Server running on http://localhost:${PORT}`);
-			console.log(`📝 Try: http://localhost:${PORT}/health`);
-		});
-	})
-	.catch((error) => {
-		console.error("Failed to initialise application statuses", error);
-		process.exitCode = 1;
-	});
+app.listen(PORT, "0.0.0.0", () => {
+	console.log(`🚀 Server running on http://localhost:${PORT}`);
+	console.log(`📝 Try: http://localhost:${PORT}/health`);
+});
+
+ensureApplicationStatuses().catch((error) => {
+	console.error("Failed to initialise application statuses", error);
+});
