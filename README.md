@@ -54,6 +54,7 @@ npm run prepare
 * `GET /api/job-roles/filter-options` returns a JSON object containing the available filters for job roles.
 * `GET /api/job-roles/create-options` returns the capability, band, and status options for creating a job role. Requires an Admin token.
 * `GET /api/job-roles/:id` returns a JSON object detailing a specific job role.
+* `POST /api/job-roles/update-statuses` closes open job roles whose closing date has passed or whose available positions are zero. Requires the `x-job-role-status-secret` header and returns the number of roles closed.
 * `POST /api/job-roles` creates a new job role. Requires an Admin token.
 * `PUT /api/job-roles/:id` updates an existing job role. Requires an Admin token.
 * `DELETE /api/job-roles/:id` deletes a job role. Requires an Admin token.
