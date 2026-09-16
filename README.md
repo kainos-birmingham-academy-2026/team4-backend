@@ -62,8 +62,25 @@ npm run prepare
 * `GET /api/applications` returns the applications submitted by the current authenticated user. Each application includes `applicationId`, `userId`, `jobRoleId`, `roleName`, `status`, and `createdAt`. Requires a user token.
 * `POST /api/applications` submits a job application for the current authenticated user. Requires a user token.
 * `GET /api/applications/job-role/:jobRoleId` returns the applications submitted for a job role, including applicant email and message. Requires an Admin token.
+* `POST /api/applications/job-role/:jobRoleId/fit-assessments` assesses all applications for the role that do not already have a completed fit assessment. Requires an Admin token.
 * `POST /api/applications/:applicationId/hire` marks an in-progress application as hired and reduces the role's open positions by one. Requires an Admin token.
 * `POST /api/applications/:applicationId/reject` marks an in-progress application as rejected. Requires an Admin token.
+
+### Applicant fit assessment
+
+The role-level fit-assessment endpoint uses the Azure OpenAI Responses API to provide recruiter decision support. It sends the application message, role description, and role responsibilities to the configured Azure deployment. It does not send the applicant email or user ID.
+
+Each result is validated and stored on the application with:
+
+- A score from 0 to 100
+- An evidence-based summary
+- Matching strengths
+- Missing or unclear requirements
+- Assessment status and audit metadata (model, prompt version, and timestamp)
+
+Completed assessments are skipped on later requests to avoid unnecessary model calls. A provider error for one application is stored as `Unavailable` and does not stop the rest of the batch; invalid model output is stored as `Failed`.
+
+The output is decision support only. The prompt instructs the model not to infer protected characteristics or make a hire/reject decision. Fit fields are returned to admin application views only and are not included in applicant-facing application responses.
 
 ### Chat
 * `POST /api/chat` sends a message to the careers chat assistant and returns a response.
@@ -87,7 +104,7 @@ A client must be logged in to send requests to the job role pages. To log in:
 If you want to use an admin account, use these credentials:
 ```JSON
 {
-   "email": "admin@example.com"
+   "email": "admin@example.com",
    "password": "AdminPassword123!"
 }
 ```
@@ -102,8 +119,16 @@ Add the `.env` file to the root folder of the project and put these values in th
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/jobRoles"
 PORT=4000
 JWT_SECRET=<generate_a_random_value>
+AZURE_OPENAI_ENDPOINT=https://team4-fitscore.openai.azure.com/openai/v1
+AZURE_OPENAI_API_KEY=<local_development_secret>
+AZURE_OPENAI_DEPLOYMENT=gpt-5.4-nano
+FIT_PROMPT_VERSION=v1
 ```
 Make sure the USERNAME and PASSWORD match your own database username and password.
+
+`AZURE_OPENAI_API_KEY` must remain in the ignored local `.env` file. It is used only by the backend to assess application text against job requirements and must never be committed or sent to the browser.
+
+The endpoint is read from `AZURE_OPENAI_ENDPOINT` and the deployment name is passed as the `model` value to the Responses API. Confirm that `AZURE_OPENAI_DEPLOYMENT` is the exact deployment name in Azure, not only the underlying model name. Restart the backend after changing these values because they are loaded when the service starts.
 
 ## Docker Compose (Full-Stack Setup)
 
@@ -161,6 +186,14 @@ The `-v` flag removes volumes (including the database), allowing you to run `doc
 3. Run migrations: `npx prisma migrate deploy`
 4. Seed database: `npx prisma db seed`
 5. Start dev server: `npm run dev`
+
+The seed creates demo users and three completed applications for each of these roles, with high, middle, and low fit scores:
+
+- Graduate Software Engineer: 92%, 64%, and 31%
+- Senior Test Engineer: 91%, 61%, and 28%
+- Associate Platform Engineer: 88%, 59%, and 25%
+
+The seeded applicant accounts use the password `Password123!`. The seed clears and recreates job roles and applications, so use it only when refreshing local demo data is acceptable.
 
 
 ## Database commands

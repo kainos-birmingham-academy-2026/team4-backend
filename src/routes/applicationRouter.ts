@@ -4,6 +4,7 @@ import { ApplicationController } from "../controllers/applicationController.js";
 import { CreateApplicationSchema } from "../dtos/applicationDto.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { validateBody, validateParams } from "../middlewares/validate.js";
+import { ApplicationFitService } from "../services/applicationFitService.js";
 import { ApplicationService } from "../services/applicationService.js";
 
 const JobRoleApplicationsParamsSchema = z.object({
@@ -17,10 +18,12 @@ const AssessApplicationParamsSchema = z.object({
 
 export const createApplicationRouter = (
 	applicationService?: ApplicationService,
+	applicationFitService?: ApplicationFitService,
 ): Router => {
 	const router = Router();
 	const controller = new ApplicationController(
 		applicationService ?? new ApplicationService(),
+		applicationFitService ?? new ApplicationFitService(),
 	);
 
 	router.use(requireAuth(false));
@@ -31,6 +34,12 @@ export const createApplicationRouter = (
 		requireAuth(true),
 		validateParams(JobRoleApplicationsParamsSchema),
 		controller.getApplicationsByJobRole.bind(controller),
+	);
+	router.post(
+		"/job-role/:jobRoleId/fit-assessments",
+		requireAuth(true),
+		validateParams(JobRoleApplicationsParamsSchema),
+		controller.assessApplicationsForJobRole.bind(controller),
 	);
 	router.post(
 		"/:applicationId/:action",

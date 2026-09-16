@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import type { CreateApplicationRequest } from "../dtos/applicationDto.js";
+import { ApplicationFitService } from "../services/applicationFitService.js";
 import {
 	ApplicationError,
 	ApplicationService,
@@ -8,6 +9,7 @@ import {
 export class ApplicationController {
 	constructor(
 		private readonly applicationService: ApplicationService = new ApplicationService(),
+		private readonly applicationFitService: ApplicationFitService = new ApplicationFitService(),
 	) {}
 
 	async createApplication(req: Request, res: Response): Promise<void> {
@@ -82,6 +84,25 @@ export class ApplicationController {
 				targetStatus,
 			);
 			res.status(200).json(application);
+		} catch (error) {
+			if (error instanceof ApplicationError) {
+				res.status(error.statusCode).json({ error: error.message });
+				return;
+			}
+			res.status(500).json({ error: "Internal server error" });
+		}
+	}
+
+	async assessApplicationsForJobRole(
+		req: Request,
+		res: Response,
+	): Promise<void> {
+		try {
+			const result =
+				await this.applicationFitService.assessApplicationsForJobRole(
+					Number(req.params.jobRoleId),
+				);
+			res.status(200).json(result);
 		} catch (error) {
 			if (error instanceof ApplicationError) {
 				res.status(error.statusCode).json({ error: error.message });
