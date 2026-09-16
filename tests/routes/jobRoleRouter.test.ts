@@ -64,6 +64,33 @@ describe("GET /api/job-roles", async () => {
 	});
 });
 
+describe("POST /api/job-roles/update-statuses", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		process.env.JOB_ROLE_STATUS_UPDATE_SECRET = "status-update-secret";
+	});
+
+	it("closes eligible job roles with the workflow secret", async () => {
+		mockService.closeEligibleJobRoles = vi.fn().mockResolvedValue(2);
+
+		const response = await request(testApp)
+			.post("/api/job-roles/update-statuses")
+			.set("x-job-role-status-secret", "status-update-secret");
+
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({ closedCount: 2 });
+	});
+
+	it("rejects requests without the workflow secret", async () => {
+		const response = await request(testApp).post(
+			"/api/job-roles/update-statuses",
+		);
+
+		expect(response.status).toBe(401);
+		expect(mockService.closeEligibleJobRoles).not.toHaveBeenCalled();
+	});
+});
+
 describe("GET /api/job-roles/export", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();

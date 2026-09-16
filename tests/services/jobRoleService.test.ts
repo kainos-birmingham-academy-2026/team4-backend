@@ -19,6 +19,7 @@ vi.mock("../../src/prismaClient", () => ({
 			findUnique: vi.fn(),
 			create: vi.fn(),
 			delete: vi.fn(),
+			updateMany: vi.fn(),
 		},
 		capability: {
 			findUnique: vi.fn(),
@@ -69,6 +70,57 @@ describe("JobRoleService - findAllJobRoles", () => {
 			orderBy: { jobRoleId: "asc" },
 		});
 		expect(mapJobRoleToResponseMock).toHaveBeenCalledTimes(mockJobRoles.length);
+	});
+});
+
+describe("JobRoleService - closeEligibleJobRoles", () => {
+	let jobRoleService: JobRoleService;
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+		jobRoleService = new JobRoleService();
+	});
+
+	it("closes open roles past their closing date or with no positions", async () => {
+		const now = new Date("2026-09-16T12:00:00.000Z");
+		vi.mocked(prisma.status.findUnique)
+			.mockResolvedValueOnce({ statusId: 1, statusName: "Open" } as never)
+			.mockResolvedValueOnce({ statusId: 2, statusName: "Closed" } as never);
+		vi.mocked(prisma.jobRole.findMany).mockResolvedValue([
+			{ jobRoleId: 1 },
+			{ jobRoleId: 2 },
+		] as never);
+		vi.mocked(prisma.jobRole.updateMany).mockResolvedValue({ count: 2 });
+
+		const result = await jobRoleService.closeEligibleJobRoles(now);
+
+		expect(result).toBe(2);
+		expect(prisma.jobRole.findMany).toHaveBeenCalledWith({
+			where: {
+				statusId: 1,
+				OR: [
+					{ closingDate: { lt: now } },
+					{ numberOfOpenPositions: { lte: 0 } },
+				],
+			},
+			select: { jobRoleId: true },
+		});
+		expect(prisma.jobRole.updateMany).toHaveBeenCalledWith({
+			where: { jobRoleId: { in: [1, 2] }, statusId: 1 },
+			data: { statusId: 2 },
+		});
+	});
+
+	it("does not update anything when no roles are eligible", async () => {
+		vi.mocked(prisma.status.findUnique)
+			.mockResolvedValueOnce({ statusId: 1, statusName: "Open" } as never)
+			.mockResolvedValueOnce({ statusId: 2, statusName: "Closed" } as never);
+		vi.mocked(prisma.jobRole.findMany).mockResolvedValue([]);
+
+		const result = await jobRoleService.closeEligibleJobRoles();
+
+		expect(result).toBe(0);
+		expect(prisma.jobRole.updateMany).not.toHaveBeenCalled();
 	});
 });
 

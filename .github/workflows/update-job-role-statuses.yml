@@ -1,0 +1,25 @@
+name: Update job role statuses
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update-statuses:
+    name: Close eligible job roles
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Update job role statuses
+        env:
+          BACKEND_URL: ${{ vars.BACKEND_URL }}
+          JOB_ROLE_STATUS_UPDATE_SECRET: ${{ secrets.JOB_ROLE_STATUS_UPDATE_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --url "${BACKEND_URL}/api/job-roles/update-statuses" \
+            --header "x-job-role-status-secret: ${JOB_ROLE_STATUS_UPDATE_SECRET}"

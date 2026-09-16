@@ -7,6 +7,7 @@ import {
 	JobRoleUpdateSchema,
 } from "../dtos/jobRoleDto.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireJobRoleStatusUpdateSecret } from "../middlewares/requireJobRoleStatusUpdateSecret.js";
 import {
 	validateBody,
 	validateParams,
@@ -20,6 +21,12 @@ export const createJobRoleRouter = (
 	const router = Router();
 	const controller = new JobRoleController(
 		jobRoleService ?? new JobRoleService(),
+	);
+
+	router.post(
+		"/update-statuses",
+		requireJobRoleStatusUpdateSecret,
+		controller.closeEligibleJobRoles.bind(controller),
 	);
 
 	router.use(requireAuth(false));

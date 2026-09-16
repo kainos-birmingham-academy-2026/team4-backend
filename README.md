@@ -119,6 +119,7 @@ Add the `.env` file to the root folder of the project and put these values in th
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/jobRoles"
 PORT=4000
 JWT_SECRET=<generate_a_random_value>
+JOB_ROLE_STATUS_UPDATE_SECRET=<generate_a_random_value>
 AZURE_OPENAI_ENDPOINT=https://team4-fitscore.openai.azure.com/openai/v1
 AZURE_OPENAI_API_KEY=<local_development_secret>
 AZURE_OPENAI_DEPLOYMENT=gpt-5.4-nano
@@ -129,6 +130,8 @@ Make sure the USERNAME and PASSWORD match your own database username and passwor
 `AZURE_OPENAI_API_KEY` must remain in the ignored local `.env` file. It is used only by the backend to assess application text against job requirements and must never be committed or sent to the browser.
 
 The endpoint is read from `AZURE_OPENAI_ENDPOINT` and the deployment name is passed as the `model` value to the Responses API. Confirm that `AZURE_OPENAI_DEPLOYMENT` is the exact deployment name in Azure, not only the underlying model name. Restart the backend after changing these values because they are loaded when the service starts.
+
+The nightly job-role status workflow uses the `JOB_ROLE_STATUS_UPDATE_SECRET` GitHub environment secret and sends requests to the `BACKEND_URL` GitHub environment variable.
 
 ## Docker Compose (Full-Stack Setup)
 

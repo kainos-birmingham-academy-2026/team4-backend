@@ -84,6 +84,42 @@ export class JobRoleService {
 		);
 	}
 
+	async closeEligibleJobRoles(now: Date = new Date()): Promise<number> {
+		const [openStatus, closedStatus] = await Promise.all([
+			prisma.status.findUnique({ where: { statusName: "Open" } }),
+			prisma.status.findUnique({ where: { statusName: "Closed" } }),
+		]);
+
+		if (!openStatus || !closedStatus) {
+			throw new Error("Open or Closed status not found");
+		}
+
+		const eligibleJobRoles = await prisma.jobRole.findMany({
+			where: {
+				statusId: openStatus.statusId,
+				OR: [
+					{ closingDate: { lt: now } },
+					{ numberOfOpenPositions: { lte: 0 } },
+				],
+			},
+			select: { jobRoleId: true },
+		});
+
+		if (eligibleJobRoles.length === 0) {
+			return 0;
+		}
+
+		const result = await prisma.jobRole.updateMany({
+			where: {
+				jobRoleId: { in: eligibleJobRoles.map(({ jobRoleId }) => jobRoleId) },
+				statusId: openStatus.statusId,
+			},
+			data: { statusId: closedStatus.statusId },
+		});
+
+		return result.count;
+	}
+
 	async findJobRoleById(id: number): Promise<JobRoleDetailedResponse | null> {
 		const jobRole = await prisma.jobRole.findUnique({
 			where: { jobRoleId: id },
