@@ -71,6 +71,20 @@ export type JobRoleOrdering = {
 	sortOrder?: JobRoleQuery["sortOrder"];
 };
 
+export const JobRoleComparisonQuerySchema = z
+	.object({
+		roleA: z.coerce.number().int().positive(),
+		roleB: z.coerce.number().int().positive(),
+	})
+	.refine(({ roleA, roleB }) => roleA !== roleB, {
+		message: "Select two different job roles",
+		path: ["roleB"],
+	});
+
+export type JobRoleComparisonQuery = z.infer<
+	typeof JobRoleComparisonQuerySchema
+>;
+
 export const JobRoleCreateSchema = z.object({
 	roleName: z.string().trim().min(1).max(200),
 	description: z.string().trim().min(1).max(5000),
@@ -142,4 +156,23 @@ export class JobRoleDetailedResponse extends JobRoleResponse {
 			statusId,
 		);
 	}
+}
+
+export interface CareerMatrixOption {
+	id: number;
+	name: string;
+}
+
+export interface CareerMatrixResponse {
+	capabilities: CareerMatrixOption[];
+	bands: CareerMatrixOption[];
+	matrix: Record<string, JobRoleDetailedResponse[]>;
+}
+
+export interface JobRoleComparisonResponse {
+	roleA: JobRoleDetailedResponse;
+	roleB: JobRoleDetailedResponse;
+	sharedResponsibilities: string[];
+	roleAResponsibilities: string[];
+	roleBResponsibilities: string[];
 }

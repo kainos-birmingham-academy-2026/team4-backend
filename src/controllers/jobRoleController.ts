@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import type {
+	JobRoleComparisonQuery,
 	JobRoleCreateInput,
 	JobRoleDetailedResponse,
 	JobRoleQuery,
@@ -112,6 +113,34 @@ export class JobRoleController {
 		try {
 			const options = await this.jobRoleService.findFilterOptions();
 			res.status(200).json(options);
+		} catch (error) {
+			this.sendInternalServerError(res, error);
+		}
+	}
+
+	async getCareerMatrix(_req: Request, res: Response): Promise<void> {
+		try {
+			const matrix = await this.jobRoleService.findCareerMatrix();
+			res.status(200).json(matrix);
+		} catch (error) {
+			this.sendInternalServerError(res, error);
+		}
+	}
+
+	async compareJobRoles(_req: Request, res: Response): Promise<void> {
+		const { roleA, roleB } = res.locals
+			.validatedQuery as JobRoleComparisonQuery;
+
+		try {
+			const comparison = await this.jobRoleService.compareJobRoles(
+				roleA,
+				roleB,
+			);
+			if (!comparison) {
+				res.status(404).json({ error: "Job role not found" });
+				return;
+			}
+			res.status(200).json(comparison);
 		} catch (error) {
 			this.sendInternalServerError(res, error);
 		}

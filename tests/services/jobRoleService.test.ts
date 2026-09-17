@@ -3,7 +3,9 @@ import prisma from "../../src/prismaClient";
 import { JobRoleService } from "../../src/services/jobRoleService";
 import {
 	mockJobRole1,
+	mockJobRole2,
 	mockJobRoleDetailedResponse1,
+	mockJobRoleDetailedResponse2,
 	mockJobRoleResponse1,
 	mockJobRoleResponses,
 	mockJobRoles,
@@ -153,6 +155,66 @@ describe("JobRoleService - findJobRoleById", () => {
 
 		expect(result).toBeNull();
 		expect(mapJobRoleToDetailedResponseMock).not.toHaveBeenCalled();
+	});
+});
+
+describe("JobRoleService - career tools", () => {
+	let jobRoleService: JobRoleService;
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+		mapJobRoleToDetailedResponseMock.mockReset();
+		jobRoleService = new JobRoleService();
+	});
+
+	it("groups open roles by capability and band", async () => {
+		vi.mocked(prisma).capability.findMany = vi
+			.fn()
+			.mockResolvedValue([{ capabilityId: 1, capabilityName: "Engineering" }]);
+		vi.mocked(prisma).band.findMany = vi
+			.fn()
+			.mockResolvedValue([{ bandId: 1, bandName: "Band 1" }]);
+		vi.mocked(prisma).jobRole.findMany = vi
+			.fn()
+			.mockResolvedValue([mockJobRole1]);
+		mapJobRoleToDetailedResponseMock.mockResolvedValue({
+			...mockJobRoleDetailedResponse1,
+			capabilityId: 1,
+			bandId: 1,
+		});
+
+		const result = await jobRoleService.findCareerMatrix();
+
+		expect(result.matrix["1_1"]).toHaveLength(1);
+		expect(vi.mocked(prisma).jobRole.findMany).toHaveBeenCalledWith({
+			where: {
+				status: { statusName: "Open" },
+				numberOfOpenPositions: { gt: 0 },
+			},
+			orderBy: { roleName: "asc" },
+		});
+	});
+
+	it("identifies shared and role-specific responsibilities", async () => {
+		vi.mocked(prisma).jobRole.findUnique = vi
+			.fn()
+			.mockResolvedValueOnce(mockJobRole1)
+			.mockResolvedValueOnce(mockJobRole2);
+		mapJobRoleToDetailedResponseMock
+			.mockResolvedValueOnce(mockJobRoleDetailedResponse1)
+			.mockResolvedValueOnce({
+				...mockJobRoleDetailedResponse2,
+				responsibilities: ["review CODE", "Define product roadmap"],
+			});
+
+		const result = await jobRoleService.compareJobRoles(1, 2);
+
+		expect(result?.sharedResponsibilities).toEqual(["Review code"]);
+		expect(result?.roleAResponsibilities).toEqual([
+			"Write code",
+			"Deploy applications",
+		]);
+		expect(result?.roleBResponsibilities).toEqual(["Define product roadmap"]);
 	});
 });
 

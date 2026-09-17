@@ -1,5 +1,7 @@
 import type { JobRole, Prisma } from "@prisma/client";
 import type {
+	CareerMatrixResponse,
+	JobRoleComparisonResponse,
 	JobRoleCreateInput,
 	JobRoleDetailedResponse,
 	JobRoleFilters,
@@ -128,6 +130,82 @@ export class JobRoleService {
 			return null;
 		}
 		return this.jobRoleMapper.mapJobRoleToDetailedResponse(jobRole);
+	}
+
+	async findCareerMatrix(): Promise<CareerMatrixResponse> {
+		const [capabilities, bands, jobRoles] = await Promise.all([
+			prisma.capability.findMany({
+				select: { capabilityId: true, capabilityName: true },
+				orderBy: { capabilityName: "asc" },
+			}),
+			prisma.band.findMany({
+				select: { bandId: true, bandName: true },
+				orderBy: { bandId: "asc" },
+			}),
+			prisma.jobRole.findMany({
+				where: {
+					status: { statusName: "Open" },
+					numberOfOpenPositions: { gt: 0 },
+				},
+				orderBy: { roleName: "asc" },
+			}),
+		]);
+		const roles = await Promise.all(
+			jobRoles.map((jobRole) =>
+				this.jobRoleMapper.mapJobRoleToDetailedResponse(jobRole),
+			),
+		);
+		const matrix: CareerMatrixResponse["matrix"] = {};
+
+		for (const role of roles) {
+			const key = `${role.capabilityId}_${role.bandId}`;
+			if (!matrix[key]) matrix[key] = [];
+			matrix[key].push(role);
+		}
+
+		return {
+			capabilities: capabilities.map(({ capabilityId, capabilityName }) => ({
+				id: capabilityId,
+				name: capabilityName,
+			})),
+			bands: bands.map(({ bandId, bandName }) => ({
+				id: bandId,
+				name: bandName,
+			})),
+			matrix,
+		};
+	}
+
+	async compareJobRoles(
+		roleAId: number,
+		roleBId: number,
+	): Promise<JobRoleComparisonResponse | null> {
+		const [roleA, roleB] = await Promise.all([
+			this.findJobRoleById(roleAId),
+			this.findJobRoleById(roleBId),
+		]);
+		if (!roleA || !roleB) return null;
+
+		const normalizedRoleA = new Set(
+			roleA.responsibilities.map((item) => item.trim().toLocaleLowerCase()),
+		);
+		const normalizedRoleB = new Set(
+			roleB.responsibilities.map((item) => item.trim().toLocaleLowerCase()),
+		);
+
+		return {
+			roleA,
+			roleB,
+			sharedResponsibilities: roleA.responsibilities.filter((item) =>
+				normalizedRoleB.has(item.trim().toLocaleLowerCase()),
+			),
+			roleAResponsibilities: roleA.responsibilities.filter(
+				(item) => !normalizedRoleB.has(item.trim().toLocaleLowerCase()),
+			),
+			roleBResponsibilities: roleB.responsibilities.filter(
+				(item) => !normalizedRoleA.has(item.trim().toLocaleLowerCase()),
+			),
+		};
 	}
 
 	async findPaginatedJobRoles(
