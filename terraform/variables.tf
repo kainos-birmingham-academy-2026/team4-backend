@@ -104,6 +104,12 @@ variable "jwt_secret_name" {
   default     = "jwt-secret"
 }
 
+variable "job_role_status_secret_name" {
+  description = "Key Vault secret name for JOB_ROLE_STATUS_UPDATE_SECRET."
+  type        = string
+  default     = "job-role-status-update-secret"
+}
+
 variable "feature_flags_enabled" {
   description = "Feature flag toggle passed into the Container App as FEATURE_FLAGS_ENABLED."
   type        = bool

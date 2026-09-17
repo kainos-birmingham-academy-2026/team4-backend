@@ -141,6 +141,15 @@ export class JobRoleController {
 		}
 	}
 
+	async closeEligibleJobRoles(_req: Request, res: Response): Promise<void> {
+		try {
+			const closedCount = await this.jobRoleService.closeEligibleJobRoles();
+			res.status(200).json({ closedCount });
+		} catch (error) {
+			this.sendInternalServerError(res, error);
+		}
+	}
+
 	async create(req: Request, res: Response): Promise<void> {
 		try {
 			const jobRole = await this.jobRoleService.createJobRole(

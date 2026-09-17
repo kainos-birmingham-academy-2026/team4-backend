@@ -95,6 +95,7 @@ module "backend_container_app" {
   image                        = "${data.azurerm_container_registry.shared.login_server}/${var.backend_image_name}:${var.backend_image_tag}"
   database_url_secret_id       = "${module.key_vault.uri}secrets/${var.database_url_secret_name}"
   jwt_secret_id                = "${module.key_vault.uri}secrets/${var.jwt_secret_name}"
+  job_role_status_secret_id    = "${module.key_vault.uri}secrets/${var.job_role_status_secret_name}"
   feature_flags_enabled        = var.feature_flags_enabled
   environment                  = var.environment
 }

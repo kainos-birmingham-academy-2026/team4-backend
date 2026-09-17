@@ -38,6 +38,11 @@ variable "jwt_secret_id" {
   type        = string
 }
 
+variable "job_role_status_secret_id" {
+  description = "Versionless Key Vault secret ID for JOB_ROLE_STATUS_UPDATE_SECRET."
+  type        = string
+}
+
 variable "feature_flags_enabled" {
   description = "Deployment-level feature flag for the backend."
   type        = bool
